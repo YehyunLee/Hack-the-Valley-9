@@ -100,10 +100,12 @@ export default function ObjectDetection() {
         const [xmin, ymin, width, height] = prediction.bbox;
         const score = prediction.score;
 
-        if (score < 0.5) return;
+        if (score < 0.6) return;
 
         if (!newDetectedObjects.includes(prediction.class)) {
-          newDetectedObjects.push(prediction.class);
+          if (prediction.class !== "wine glass") {
+            newDetectedObjects.push(prediction.class);
+          }
         }
 
         // Scale the bounding box coordinates based on the scaling factors
@@ -133,7 +135,11 @@ export default function ObjectDetection() {
         label.style.padding = "2px 6px";
         label.style.borderRadius = "4px";
         label.innerText = `${prediction.class}: ${score.toFixed(2)}`;
-        label.style.left = `${scaledXmin}px`;
+        let labelX = scaledXmin;
+        if (labelX > 24) {
+          labelX = 24;
+        }
+        label.style.left = `${labelX}px`;
         label.style.top = `${scaledYmin - 24}px`;
 
         box.appendChild(label);

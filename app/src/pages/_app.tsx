@@ -24,7 +24,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
 
   return (
     <SessionProvider session={session}>
-      <div className=" font-mono">
+      <div className="font-mono">
       <Nav />
       <main className="h-full min-h-screen">
         <Component {...pageProps} />
