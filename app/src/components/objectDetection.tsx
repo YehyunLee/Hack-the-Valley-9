@@ -7,6 +7,8 @@ export default function ObjectDetection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null); // Reference for overlay div
   const [model, setModel] = useState<any>(null); // To hold the loaded model
+  const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
+  const [classificationResult, setClassificationResult] = useState<string>("");
 
   // Load the model when the component mounts
   useEffect(() => {
@@ -45,6 +47,10 @@ export default function ObjectDetection() {
     // Perform object detection
     const predictions = await model.detect(videoRef.current);
 
+    // Store detected object classes without duplicates
+    const newDetectedObjects: string[] = [];
+
+
     if (overlayRef.current) {
       // Clear previous boxes
       overlayRef.current.innerHTML = "";
@@ -55,6 +61,11 @@ export default function ObjectDetection() {
         const score = prediction.score;
 
         if (score < 0.5) continue; // Only consider predictions above the confidence threshold
+
+        // Avoid adding duplicate detected objects
+        if (!newDetectedObjects.includes(prediction.class)) {
+          newDetectedObjects.push(prediction.class);
+        }
 
         // Create a new div for the bounding box
         const box = document.createElement("div");
@@ -81,6 +92,8 @@ export default function ObjectDetection() {
         overlayRef.current.appendChild(box);
       }
     }
+    // Update the detected objects state
+    setDetectedObjects(Array.from(newDetectedObjects));
   };
 
   useEffect(() => {
@@ -118,6 +131,22 @@ export default function ObjectDetection() {
         }}
       />
       <canvas ref={canvasRef} width="640" height="480" style={{ display: "none" }}></canvas>
+      {detectedObjects.length > 0 && (
+        <div style={{ position: "absolute", bottom: "10px", left: "10px", zIndex: 2, backgroundColor: "white", padding: "10px", borderRadius: "5px" }}>
+          <h4>Detected Objects:</h4>
+          <ul>
+            <li>{detectedObjects.join(', ')}</li>
+          </ul>
+          <button>Classify with LLM</button>
+        </div>
+      )}
+      {classificationResult && (
+        <div style={{ position: "absolute", bottom: "60px", left: "10px", zIndex: 2, backgroundColor: "white", padding: "10px", borderRadius: "5px" }}>
+          <h4>Classification Result:</h4>
+          <p>{classificationResult}</p>
+        </div>
+      )}
+
     </div>
   );
 }
