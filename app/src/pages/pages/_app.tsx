@@ -7,7 +7,7 @@ import 'aos/dist/aos.css';
 
 import { api } from "~/utils/api";
 
-import "~/styles/globals.css";
+import "../../styles/globals.css";
 // import "../output.css";
 import { useEffect } from "react";
 
