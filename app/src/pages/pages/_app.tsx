@@ -1,7 +1,7 @@
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppType } from "next/app";
-import Nav from '../components/nav';
+import Nav from '../../components/nav';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
