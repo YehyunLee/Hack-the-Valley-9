@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "@tensorflow/tfjs";
-import classifyObjects from "../server/api/classification"; 
 
 export default function ObjectDetection() {
   const videoRef = useRef<HTMLVideoElement>(null);
