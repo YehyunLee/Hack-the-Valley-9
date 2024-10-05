@@ -4,7 +4,7 @@ import Head from "next/head";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
-import TrashcamLeaderboard from "~/components/trashcamLeaderboard";
+import TrashcamLeaderboard from "../components/trashcamLeaderboard";
 
 const users: [string, number][] = [
   ['user1', 10],
