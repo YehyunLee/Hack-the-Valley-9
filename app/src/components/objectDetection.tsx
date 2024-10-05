@@ -1,12 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "@tensorflow/tfjs";
+import classifyObjects from "../server/api/classification"; 
 
 export default function ObjectDetection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null); // Reference for overlay div
   const [model, setModel] = useState<any>(null); // To hold the loaded model
+  const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
+  const [classificationResult, setClassificationResult] = useState<string>(""); 
+  const [isLoading, setIsLoading] = useState(false);
 
   // Load the model when the component mounts
   useEffect(() => {
@@ -45,6 +49,10 @@ export default function ObjectDetection() {
     // Perform object detection
     const predictions = await model.detect(videoRef.current);
 
+    // Store detected object classes without duplicates
+    const newDetectedObjects: string[] = [];
+
+
     if (overlayRef.current) {
       // Clear previous boxes
       overlayRef.current.innerHTML = "";
@@ -55,6 +63,12 @@ export default function ObjectDetection() {
         const score = prediction.score;
 
         if (score < 0.5) continue; // Only consider predictions above the confidence threshold
+        
+        // Avoid adding duplicate detected objects
+        if (!newDetectedObjects.includes(prediction.class)) {
+          newDetectedObjects.push(prediction.class);
+        }
+
 
         // Create a new div for the bounding box
         const box = document.createElement("div");
@@ -80,6 +94,25 @@ export default function ObjectDetection() {
         box.appendChild(label);
         overlayRef.current.appendChild(box);
       }
+    }
+    // Update the detected objects state
+    setDetectedObjects(Array.from(newDetectedObjects));
+  };
+
+  const classifyObjects = async (objects: string[]): Promise<void> => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objects }),
+      });
+      const data = await response.json();
+      setClassificationResult(data.classification);
+    } catch (error) {
+      console.error("Error classifying objects:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -118,6 +151,54 @@ export default function ObjectDetection() {
         }}
       />
       <canvas ref={canvasRef} width="640" height="480" style={{ display: "none" }}></canvas>
+      {detectedObjects.length > 0 && (
+      <div 
+        style={{
+          position: "absolute", 
+          bottom: "80px", 
+          left: "10px", 
+          zIndex: 2, 
+          backgroundColor: "white", 
+          padding: "10px", 
+          borderRadius: "5px",
+          width: "fit-content"
+        }}>
+        <h4>Detected Objects:</h4>
+        <ul>
+          <li>{detectedObjects.join(', ')}</li>
+        </ul>
+        <button onClick={() => classifyObjects(detectedObjects)}>Classify with LLM</button>
+      </div>
+    )}
+
+    {isLoading ? (
+      <div style={{
+        position: "absolute",
+        bottom: "10px",
+        left: "10px",
+        zIndex: 3, 
+        backgroundColor: "white",
+        padding: "10px",
+        borderRadius: "5px"
+      }}>
+        <p>Loading...</p>
+      </div>
+    ) : classificationResult && (
+      <div 
+        style={{
+          position: "absolute", 
+          bottom: "10px",  
+          left: "10px", 
+          zIndex: 2, 
+          backgroundColor: "white", 
+          padding: "10px", 
+          borderRadius: "5px",
+          width: "fit-content"
+        }}>
+        <h4>Classification Result:</h4>
+        <p>{classificationResult}</p>
+      </div>
+    )}
     </div>
   );
 }
