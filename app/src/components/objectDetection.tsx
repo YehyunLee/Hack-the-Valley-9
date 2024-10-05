@@ -77,6 +77,18 @@ export default function ObjectDetection() {
     const context = canvas.getContext("2d");
     if (!context) return;
 
+    // Get the actual video size used in object detection (from webcam)
+    const videoWidth = videoRef.current.videoWidth;
+    const videoHeight = videoRef.current.videoHeight;
+
+    // Get the displayed video size (resized)
+    const displayedWidth = videoRef.current.clientWidth;
+    const displayedHeight = videoRef.current.clientHeight;
+
+    // Calculate scaling factors between the actual and displayed video sizes
+    const scaleX = displayedWidth / videoWidth;
+    const scaleY = displayedHeight / videoHeight;
+
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     const predictions = await model.detect(videoRef.current);
     const newDetectedObjects: string[] = [];
@@ -94,15 +106,21 @@ export default function ObjectDetection() {
           newDetectedObjects.push(prediction.class);
         }
 
+        // Scale the bounding box coordinates based on the scaling factors
+        const scaledXmin = xmin * scaleX;
+        const scaledYmin = ymin * scaleY;
+        const scaledWidth = width * scaleX;
+        const scaledHeight = height * scaleY;
+
         // Create bounding box
         const box = document.createElement("div");
         box.style.position = "absolute";
         box.style.border = "2px solid #4caf50";
         box.style.borderRadius = "4px";
-        box.style.left = `${xmin}px`;
-        box.style.top = `${ymin}px`;
-        box.style.width = `${width}px`;
-        box.style.height = `${height}px`;
+        box.style.left = `${scaledXmin}px`;
+        box.style.top = `${scaledYmin}px`;
+        box.style.width = `${scaledWidth}px`;
+        box.style.height = `${scaledHeight}px`;
         box.style.pointerEvents = "none";
         box.style.boxShadow = "0 0 8px rgba(0, 0, 0, 0.5)";
 
@@ -115,8 +133,8 @@ export default function ObjectDetection() {
         label.style.padding = "2px 6px";
         label.style.borderRadius = "4px";
         label.innerText = `${prediction.class}: ${score.toFixed(2)}`;
-        label.style.left = `${xmin}px`;
-        label.style.top = `${ymin - 24}px`;
+        label.style.left = `${scaledXmin}px`;
+        label.style.top = `${scaledYmin - 24}px`;
 
         box.appendChild(label);
         if (overlayRef.current) {
@@ -160,6 +178,29 @@ export default function ObjectDetection() {
   // Function to toggle between front and back cameras
   const toggleCamera = () => {
     setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
+  };
+
+  // Add slight delay to object detection to allow UI to update quickly
+  const handleMouseDown = () => {
+    setIsDetecting(true); // Update button state immediately
+    setTimeout(() => {
+      setIsDetecting(true);
+    }, 0); // Detect after UI updates
+  };
+
+  const handleMouseUp = () => {
+    setIsDetecting(false);
+  };
+
+  const handleTouchStart = () => {
+    setIsDetecting(true);
+    setTimeout(() => {
+      setIsDetecting(true);
+    }, 0);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDetecting(false);
   };
 
   return (
@@ -220,9 +261,8 @@ export default function ObjectDetection() {
 
       <div className="absolute bottom-8 flex justify-center w-full">
         <button
-          className={`w-20 h-20 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold ${
-            isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
-          }`}
+          className={`w-20 h-20 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold ${isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
+            }`}
           onMouseDown={() => {
             setIsDetecting(true);
             setDetectedObjects([]); // Reset detected objects when detecting starts
@@ -234,7 +274,7 @@ export default function ObjectDetection() {
           }}
           onTouchEnd={() => setIsDetecting(false)}
         >
-          
+
         </button>
       </div>
     </div>
