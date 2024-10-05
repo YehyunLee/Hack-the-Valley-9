@@ -8,7 +8,7 @@ export default function ObjectDetection() {
   const overlayRef = useRef<HTMLDivElement>(null); // Reference for overlay div
   const [model, setModel] = useState<any>(null); // To hold the loaded model
   const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
-  const [classificationResult, setClassificationResult] = useState<string>("");
+  const [isDetecting, setIsDetecting] = useState<boolean>(false); // Track detection state
 
   // Load the model when the component mounts
   useEffect(() => {
@@ -34,8 +34,9 @@ export default function ObjectDetection() {
     getWebcamStream();
   }, []);
 
+  // Capture and process frame for object detection
   const captureAndProcessFrame = async () => {
-    if (!canvasRef.current || !videoRef.current || !model) return;
+    if (!canvasRef.current || !videoRef.current || !model || !isDetecting) return;
 
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
@@ -69,42 +70,59 @@ export default function ObjectDetection() {
         // Create a new div for the bounding box
         const box = document.createElement("div");
         box.style.position = "absolute";
-        box.style.border = "2px solid #4caf50"; // Use a modern green color for bounding boxes
-        box.style.borderRadius = "4px"; // Rounded corners for a cleaner look
+        box.style.border = "2px solid #4caf50";
+        box.style.borderRadius = "4px";
         box.style.left = `${xmin}px`;
         box.style.top = `${ymin}px`;
         box.style.width = `${width}px`;
         box.style.height = `${height}px`;
-        box.style.pointerEvents = "none"; // Prevent interaction with the box
-        box.style.boxShadow = "0 0 8px rgba(0, 0, 0, 0.5)"; // Slight shadow for depth
+        box.style.pointerEvents = "none";
+        box.style.boxShadow = "0 0 8px rgba(0, 0, 0, 0.5)";
 
-        // Optional: Add label text to the box
+        // Add label text
         const label = document.createElement("span");
         label.style.position = "absolute";
-        label.style.backgroundColor = "rgba(0, 0, 0, 0.7)"; // Semi-transparent background
+        label.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
         label.style.color = "white";
         label.style.fontSize = "14px";
-        label.style.fontWeight = "bold";
         label.style.padding = "2px 6px";
         label.style.borderRadius = "4px";
         label.innerText = `${prediction.class}: ${score.toFixed(2)}`;
         label.style.left = `${xmin}px`;
-        label.style.top = `${ymin - 24}px`; // Adjust label position
+        label.style.top = `${ymin - 24}px`;
 
         box.appendChild(label);
         overlayRef.current.appendChild(box);
       }
     }
-    // Update the detected objects state
-    setDetectedObjects(Array.from(newDetectedObjects));
+    // Update the detected objects state (without duplicates)
+    setDetectedObjects((prevDetectedObjects) => [
+      ...new Set([...prevDetectedObjects, ...newDetectedObjects]),
+    ]);
   };
 
+  // Handle button press and hold detection
+  const handleHoldStart = () => {
+    setIsDetecting(true);
+  };
+
+  const handleHoldEnd = () => {
+    setIsDetecting(false);
+    callReleaseFunction(); // Call when the button is released
+  };
+
+  const callReleaseFunction = () => {
+    console.log("Release button. You can add more logic here.");
+  };
+
+  // Continuously process frames while detecting
   useEffect(() => {
+    if (!isDetecting) return;
     const interval = setInterval(() => {
       captureAndProcessFrame();
     }, 100);
     return () => clearInterval(interval);
-  }, [model]);
+  }, [isDetecting]);
 
   return (
     <div className="relative w-full md:w-[640px] h-[480px] mx-auto flex justify-center items-center">
@@ -126,25 +144,28 @@ export default function ObjectDetection() {
       ></canvas>
 
       {detectedObjects.length > 0 && (
-        <div className="absolute bottom-4 left-4 z-10 bg-white bg-opacity-80 p-4 rounded-lg shadow-md">
+        <div className="absolute bottom-20 left-4 z-10 bg-white bg-opacity-80 p-4 rounded-lg shadow-md">
           <h4 className="font-bold text-lg text-gray-700">Detected Objects:</h4>
           <ul className="text-gray-600">
             {detectedObjects.map((obj, idx) => (
               <li key={idx}>{obj}</li>
             ))}
           </ul>
-          <button className="mt-2 px-4 py-2 bg-green-500 text-white font-semibold rounded-md hover:bg-green-600 transition">
-            Classify with LLM
-          </button>
         </div>
       )}
 
-      {classificationResult && (
-        <div className="absolute bottom-20 left-4 z-10 bg-white bg-opacity-90 p-4 rounded-lg shadow-md">
-          <h4 className="font-bold text-lg text-gray-700">Classification Result:</h4>
-          <p className="text-gray-600">{classificationResult}</p>
-        </div>
-      )}
+      {/* Circular Hold Button */}
+      <div className="absolute bottom-8 flex justify-center w-full">
+        <button
+          className="w-20 h-20 bg-green-500 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold hover:bg-green-600 transition"
+          onMouseDown={handleHoldStart}
+          onMouseUp={handleHoldEnd}
+          onTouchStart={handleHoldStart}
+          onTouchEnd={handleHoldEnd}
+        >
+          Hold
+        </button>
+      </div>
     </div>
   );
 }
