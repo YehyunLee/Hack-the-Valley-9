@@ -1,10 +1,11 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
-import Image from "next/image";
-
 import TrashcamLeaderboard from "../components/trashcamLeaderboard";
+import ObjectDetection from "~/components/objectDetection";
 
 export default function Home() {
+  const { data: session } = useSession();
+
   return (
     <>
       <Head>
@@ -12,70 +13,74 @@ export default function Home() {
         <meta name="description" content="Trashcam website" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div>
-        <div className="snap-y snap-mandatory">
-          {/* Welcome Section */}
-          <div className="bg-F5FAFA snap-start">
-            <div
-              className="flex flex-col items-center gap-2 pb-4 px-4 md:px-0"
-              data-aos="fade-up"
+
+      <div className="snap-y snap-mandatory">
+        {/* Welcome Section */}
+        <section className="bg-F5FAFA snap-start flex flex-col items-center text-center py-16 px-4 md:px-8">
+          <h1
+            className="text-1E635F text-4xl md:text-6xl font-extrabold"
+            data-aos="fade-up"
+          >
+            Welcome to Trashcam!
+          </h1>
+          <p
+            className="text-507371 text-lg md:text-2xl mt-4"
+            data-aos="fade-up"
+            data-aos-delay="200"
+          >
+            Join the fun and start exploring!
+          </p>
+
+          {/* Add more space below the text */}
+          <div className="mt-12" data-aos="fade-up" data-aos-delay="300">
+            {!session && <ObjectDetection />}
+          </div>
+
+          <div className="mt-8" data-aos="fade-up" data-aos-delay="400">
+            <AuthShowcase />
+          </div>
+        </section>
+
+        {/* What is Trashcam Section */}
+        <section className="bg-F5FAFA snap-start py-16 px-4 md:px-8">
+          <div className="text-center max-w-4xl mx-auto">
+            <h2
+              className="text-1E635F text-3xl md:text-4xl font-bold"
+              data-aos="fade-right"
             >
-              <p className="text-1E635F mt-6 text-4xl md:text-5xl font-extrabold text-center">
-                Welcome to Trashcam!
+              What is Trashcam?
+            </h2>
+            <div className="mt-6 space-y-6" data-aos="fade-up-right">
+              <p className="text-lg md:text-xl">
+                Trashcam is a fun and interactive way to explore the outdoors.
               </p>
-              <p className="text-507371 text-lg md:text-2xl mb-4 text-center">
-                Join the fun and start exploring!
+              <p className="text-lg md:text-xl">
+                Play, clean up trash, and contribute to a cleaner environment!
               </p>
-            </div>
-
-            <div className="flex flex-col items-center gap-2 text-black">
-              <AuthShowcase />
             </div>
           </div>
+        </section>
 
-          {/* Image Section */}
-          <div className="bg-DAF2F1 h-auto md:h-[381px] flex w-full flex-col items-center gap-2">
-            <div className="scale-90 md:scale-100 w-full px-4 md:px-0">
-              <Image
-                src="/trashcan.jpg"
-                alt="Landing Page"
-                width={780}
-                height={742}
-                className="w-full h-auto"
-              />
-            </div>
-          </div>
-
-          {/* Leaderboard Section */}
-          <div className="bg-F5FAFA snap-center">
-            <h1 className="text-1E635F text-center pt-6 md:pt-[2rem] mb-4 md:mb-[1rem] text-2xl md:text-3xl font-bold">
-              Leaderboard
-            </h1>
+        {/* Leaderboard Section (always visible) */}
+        <section className="bg-F5FAFA snap-center py-16 px-4 md:px-8">
+          <h1
+            className="text-1E635F text-3xl md:text-4xl font-bold text-center mb-4"
+            data-aos="fade-up"
+          >
+            Leaderboard
+          </h1>
+          <p
+            className="text-507371 text-lg md:text-xl text-center mb-8"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            Compete to be in the top 5 on the leaderboard! 
+            Play more, clean more, and climb to the top!
+          </p>
+          <div className="mb-8" data-aos="fade-up" data-aos-delay="200">
             <TrashcamLeaderboard />
           </div>
-
-          {/* What is Trashcam Section */}
-          <div className="bg-F5FAFA snap-start">
-            <div className="textBlock text-1E635F bg-F5FAFA flex flex-col items-center pt-8 pb-8 w-full md:w-[60vw] px-4 md:px-0">
-              <h2
-                data-aos="fade-right"
-                className="text-2xl md:text-3xl font-bold text-center"
-              >
-                What is Trashcam?
-              </h2>
-              <div className="mt-4" data-aos="fade-down-right">
-                <p className="text-center">
-                  Trashcam is a fun and interactive way to explore the outdoors.
-                </p>
-              </div>
-              <div className="mt-4" data-aos="fade-up-right">
-                <p className="text-center">
-                  Play, clean up trash, and contribute to a cleaner environment!
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        </section>
       </div>
     </>
   );
@@ -83,19 +88,36 @@ export default function Home() {
 
 function AuthShowcase() {
   const { data: sessionData } = useSession();
-  const callbackUrl = '/app';
+  const callbackUrl = "/app";
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 px-4 md:px-0 pb-4">
-      <p className="text-center text-xl md:text-2xl text-black">
-        {sessionData && <span>Logged in as {sessionData.user?.name}</span>}
-      </p>
-      <button
-        className="rounded-full bg-1E635F text-white px-6 md:px-10 py-2 md:py-3 font-semibold no-underline transition hover:bg-white hover:text-1E635F hover:bg-opacity-20"
-        onClick={sessionData ? () => signOut() : () => signIn('credentials', { callbackUrl })}
-      >
-        {sessionData ? "Sign out" : "Sign in"}
-      </button>
+    <div className="flex flex-col items-center justify-center gap-6 px-4 md:px-0">
+      {sessionData ? (
+        <>
+          <p className="text-xl md:text-2xl text-1E635F">
+            Logged in as{" "}
+            <span className="font-semibold">{sessionData.user?.name}</span>
+          </p>
+          <button
+            className="rounded-full bg-1E635F text-white px-6 py-3 md:px-10 md:py-4 font-semibold transition hover:bg-1E635F/80"
+            onClick={() => signOut()}
+          >
+            Sign out
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="text-xl md:text-2xl text-1E635F">
+            Ready to start cleaning up? Sign in below!
+          </p>
+          <button
+            className="rounded-full bg-1E635F text-white px-6 py-3 md:px-10 md:py-4 font-semibold transition hover:bg-1E635F/80"
+            onClick={() => signIn("credentials", { callbackUrl })}
+          >
+            Sign in
+          </button>
+        </>
+      )}
     </div>
   );
 }
