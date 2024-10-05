@@ -5,12 +5,12 @@ import "@tensorflow/tfjs";
 export default function ObjectDetection() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const overlayRef = useRef<HTMLDivElement>(null); // Reference for overlay div
-  const [model, setModel] = useState<any>(null); // To hold the loaded model
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const [model, setModel] = useState<any>(null);
   const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
-  const [isDetecting, setIsDetecting] = useState<boolean>(false); // Track detection state
-  const [videoSize, setVideoSize] = useState({ width: 640, height: 480 }); // State for video and canvas size
-  const [cameraType, setCameraType] = useState<"user" | "environment">("environment"); // State for toggling between front and back cameras
+  const [isDetecting, setIsDetecting] = useState<boolean>(false);
+  const [videoSize, setVideoSize] = useState({ width: 640, height: 480 });
+  const [cameraType, setCameraType] = useState<"user" | "environment">("environment");
 
   // Load the model when the component mounts
   useEffect(() => {
@@ -21,13 +21,25 @@ export default function ObjectDetection() {
     loadModel();
   }, []);
 
+  // Function to stop the current video stream
+  const stopStream = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
+      tracks.forEach((track) => track.stop());
+    }
+  };
+
   // Function to access the webcam
   const getWebcamStream = async () => {
     try {
+      // Stop any active video streams before switching
+      stopStream();
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
-          facingMode: cameraType // Use the selected camera (front or back)
-        }
+          facingMode: cameraType, // Use the selected camera (front or back)
+        },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -52,7 +64,7 @@ export default function ObjectDetection() {
     const handleResize = () => {
       const screenWidth = window.innerWidth;
       const maxWidth = screenWidth < 768 ? screenWidth - 40 : 640; // Max width 640 or screen width for mobile
-      const aspectRatio = 4 / 3; // Standard aspect ratio for the video
+      const aspectRatio = 4 / 3;
       const calculatedHeight = maxWidth / aspectRatio;
 
       setVideoSize({ width: maxWidth, height: calculatedHeight });
@@ -72,32 +84,25 @@ export default function ObjectDetection() {
     const context = canvas.getContext("2d");
     if (!context) return;
 
-    // Draw the current video frame to the canvas
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
-    // Perform object detection
     const predictions = await model.detect(videoRef.current);
 
-    // Store detected object classes without duplicates
     const newDetectedObjects: string[] = [];
 
     if (overlayRef.current) {
-      // Clear previous boxes
       overlayRef.current.innerHTML = "";
 
-      // Handle predictions
       for (const prediction of predictions) {
         const [xmin, ymin, width, height] = prediction.bbox;
         const score = prediction.score;
 
-        if (score < 0.5) continue; // Only consider predictions above the confidence threshold
+        if (score < 0.5) continue;
 
-        // Avoid adding duplicate detected objects
         if (!newDetectedObjects.includes(prediction.class)) {
           newDetectedObjects.push(prediction.class);
         }
 
-        // Create a new div for the bounding box
         const box = document.createElement("div");
         box.style.position = "absolute";
         box.style.border = "2px solid #4caf50";
@@ -109,7 +114,6 @@ export default function ObjectDetection() {
         box.style.pointerEvents = "none";
         box.style.boxShadow = "0 0 8px rgba(0, 0, 0, 0.5)";
 
-        // Add label text
         const label = document.createElement("span");
         label.style.position = "absolute";
         label.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
@@ -125,7 +129,7 @@ export default function ObjectDetection() {
         overlayRef.current.appendChild(box);
       }
     }
-    // Update the detected objects state (without duplicates)
+
     setDetectedObjects((prevDetectedObjects) => [
       ...new Set([...prevDetectedObjects, ...newDetectedObjects]),
     ]);
@@ -138,7 +142,7 @@ export default function ObjectDetection() {
 
   const handleHoldEnd = () => {
     setIsDetecting(false);
-    callReleaseFunction(); // Call when the button is released
+    callReleaseFunction();
   };
 
   const callReleaseFunction = () => {
