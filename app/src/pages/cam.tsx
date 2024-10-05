@@ -19,7 +19,7 @@ export default function App() {
     if (status === "loading") return; // Still loading, don't do anything yet
 
     if (!sessionData?.user) {
-      router.push("/api/auth/signin?callbackUrl=%2Fplay");
+      router.push("/api/auth/signin?callbackUrl=%2Fapp");
     }
   }, [sessionData, status, router]);
 
