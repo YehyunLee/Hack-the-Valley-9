@@ -88,15 +88,11 @@ export default function ObjectDetection() {
         const [xmin, ymin, width, height] = prediction.bbox;
         const score = prediction.score;
 
-        if (score < 0.6) return;
+        if (score < 0.5) return;
 
         if (!newDetectedObjects.includes(prediction.class)) {
-          if (prediction.class !== "wine glass") {
-            newDetectedObjects.push(prediction.class);
-          }
+          newDetectedObjects.push(prediction.class);
         }
-
-      
 
         // Create bounding box
         const box = document.createElement("div");

@@ -37,7 +37,7 @@ export default function Home() {
           <div className="bg-DAF2F1 h-auto md:h-[381px] flex w-full flex-col items-center gap-2">
             <div className="scale-90 md:scale-100 w-full px-4 md:px-0">
               <Image
-                src="/trashcan.jpg"
+                src="/landingpage.png"
                 alt="Landing Page"
                 width={780}
                 height={742}
