@@ -28,7 +28,8 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
         only look at things that are thrown in the trash daily or very usually not occasional, so ignore any objects value such
         as person and electronics(etc, phone, laptops), and tell me where this trash should go: food waste or traditional recyclables or inorganic/non recyclable waste.
         If it's a bottle assume it's a plastic bottle. Give me just the answer like "Bottle: Traditional Recyclables" and do not include "scan other things".
-        If it's not a valid trash objects, just answer  "Scan other things".`;
+        If you already identified something then don't say "Scan other things" 
+        otherwise if nothing is a valid trash object, just answer  "Scan other things". Also ignore wine glass`;
   
       const result = await model2.generateContent(prompt);
       const textResponse = await result.response.text();
