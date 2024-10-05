@@ -25,10 +25,12 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
       const model2 = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
   
       const prompt = `From these objects: ${objects.join(', ')},
-        only look at things that are thrown in the trash daily or very usually not occasional, so ignore any objects value such
-        as person and electronics(etc, phone, laptops), and tell me where this trash should go: food waste or traditional recyclables or inorganic/non recyclable waste.
-        If it's a bottle assume it's a plastic bottle. Give me just the answer like "Bottle: Traditional Recyclables" and do not include "scan other things".
-        If it's not a valid trash objects, just answer  "Scan other things".`;
+        only look at things that are thrown in the trash daily or very usually and not occasional, so ignore any objects value such
+        as person and electronics (laptop, refrigirator, tv, cell phone), and tell me 
+        where this trash should go: compost or recyclables or inorganic waste.
+        If it's a bottle assume it's a plastic bottle. Give me the answer in this format"Bottle: Recyclables" 
+        If it's not a valid trash objects AND you don't have anything in the response as in no other proper
+        trash was seen, then answer "Scan other things". Also, ignore wine glass`;
   
       const result = await model2.generateContent(prompt);
       const textResponse = await result.response.text();
