@@ -21,6 +21,7 @@
     "@trpc/next": "^10.43.6",
     "@trpc/react-query": "^10.43.6",
     "@trpc/server": "^10.43.6",
+    "@xenova/transformers": "^2.17.2",
     "aos": "^2.3.4",
     "axios": "^1.6.7",
     "framer-motion": "^11.0.5",

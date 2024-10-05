@@ -75,7 +75,7 @@ export default function Home() {
 
 function AuthShowcase() {
   const { data: sessionData } = useSession();
-  const callbackUrl = '/play';
+  const callbackUrl = '/app';
 
   return (
     <div className="flex flex-col items-center justify-center gap-2 pb-4">

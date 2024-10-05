@@ -14,7 +14,7 @@ const Nav: React.FC = () => {
   const router = useRouter();
 
   const handleSignIn = () => {
-    signIn("credentials", { callbackUrl: "/play" });
+    signIn("credentials", { callbackUrl: "/app" });
   };
 
   const handleSignOut = () => {
@@ -22,7 +22,7 @@ const Nav: React.FC = () => {
   };
 
   const handlePlay = () => {
-    router.push("/play");
+    router.push("/app");
   };
 
   return (
