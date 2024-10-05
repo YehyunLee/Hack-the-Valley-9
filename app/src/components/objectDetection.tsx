@@ -185,7 +185,7 @@ export default function ObjectDetection() {
       ></canvas>
 
       {detectedObjects.length > 0 && (
-        <div className="absolute bottom-20 left-4 z-10 bg-white bg-opacity-80 p-4 rounded-lg shadow-md">
+        <div className="absolute bottom-5 left-4 z-10 bg-white bg-opacity-80 p-4 rounded-lg shadow-md">
           <h4 className="font-bold text-lg text-gray-700">Detected Objects:</h4>
           <ul className="text-gray-600">
             {detectedObjects.map((obj, idx) => (
@@ -199,17 +199,17 @@ export default function ObjectDetection() {
       )}
 
       {isLoading ? (
-        <div className="absolute bottom-8 left-4 z-10 bg-white p-2 rounded-lg shadow-md">
+        <div className="absolute top-2 center z-10 bg-white p-2 rounded-lg shadow-md">
           <p>Loading...</p>
         </div>
       ) : classificationResult && (
-        <div className="absolute bottom-8 left-4 z-10 bg-white p-4 rounded-lg shadow-md">
+        <div className="absolute top-2 center z-10 bg-white p-4 rounded-lg shadow-md">
           <h4 className="font-bold">Classification Result:</h4>
           <p>{classificationResult}</p>
         </div>
       )}
 
-      <div className="absolute bottom-8 left-4 z-10">
+      <div className="absolute bottom-8 right-4 z-10">
         <button
           className="bg-blue-500 text-white p-2 rounded-lg shadow-md"
           onClick={toggleCamera}
@@ -220,13 +220,15 @@ export default function ObjectDetection() {
 
       <div className="absolute bottom-8 flex justify-center w-full">
         <button
-          className="w-20 h-20 bg-green-500 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold hover:bg-green-600 transition"
+          className={`w-20 h-20 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold ${
+            isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
+          }`}
           onMouseDown={() => setIsDetecting(true)}
           onMouseUp={() => setIsDetecting(false)}
           onTouchStart={() => setIsDetecting(true)}
           onTouchEnd={() => setIsDetecting(false)}
         >
-          Hold
+          
         </button>
       </div>
     </div>
