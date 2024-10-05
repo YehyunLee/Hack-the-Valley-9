@@ -223,9 +223,15 @@ export default function ObjectDetection() {
           className={`w-20 h-20 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold ${
             isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
           }`}
-          onMouseDown={() => setIsDetecting(true)}
+          onMouseDown={() => {
+            setIsDetecting(true);
+            setDetectedObjects([]); // Reset detected objects when detecting starts
+          }}
           onMouseUp={() => setIsDetecting(false)}
-          onTouchStart={() => setIsDetecting(true)}
+          onTouchStart={() => {
+            setIsDetecting(true);
+            setDetectedObjects([]); // Reset detected objects when detecting starts
+          }}
           onTouchEnd={() => setIsDetecting(false)}
         >
           
