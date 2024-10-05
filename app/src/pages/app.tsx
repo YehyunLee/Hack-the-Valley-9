@@ -33,31 +33,34 @@ export default function App() {
 
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         {sessionData ? (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">Welcome, {sessionData.user?.name}!</h1>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold mb-4 sm:text-2xl">
+              Welcome, {sessionData.user?.name}!
+            </h1>
             <button
               onClick={() => signOut()}
-              className="px-4 py-2 bg-red-600 text-white rounded"
+              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all sm:px-3 sm:py-1 sm:text-sm"
             >
               Sign Out
             </button>
             <div className="mt-8">
-              {/* Render the Camera component if the user is logged in */}
-              <ObjectDetection />
+                <ObjectDetection />
+              </div>
             </div>
-          </div>
         ) : (
-          <div>
-            <h1 className="text-3xl font-bold mb-4">Please sign in</h1>
+          <div className="text-center">
+            <h1 className="text-3xl font-bold mb-4 sm:text-2xl">Please sign in</h1>
             <button
               onClick={() => signIn()}
-              className="px-4 py-2 bg-green-600 text-white rounded"
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-all sm:px-3 sm:py-1 sm:text-sm"
             >
               Sign In
             </button>
           </div>
         )}
       </div>
+-
     </>
   );
 }
+
