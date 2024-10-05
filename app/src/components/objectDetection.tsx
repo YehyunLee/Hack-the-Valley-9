@@ -258,16 +258,20 @@ export default function ObjectDetection() {
 
       <div className="absolute bottom-8 right-4 z-10">
         <button
-          className="bg-blue-500 text-white p-2 rounded-lg shadow-md"
+          className="bg-blue-500 text-white rounded-lg shadow-md 
+            text-sm sm:text-base md:text-lg 
+            px-3 sm:px-4 md:px-5 py-1 sm:py-2 md:py-3"
           onClick={toggleCamera}
         >
           Flip Camera
         </button>
       </div>
 
-      <div className="absolute bottom-8 flex justify-center w-full">
+
+      <div className="absolute bottom-5 flex justify-center w-full">
         <button
-          className={`w-20 h-20 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold ${isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
+          className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
+            text-lg sm:text-xl md:text-2xl font-bold ${isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
             }`}
           onMouseDown={() => {
             setIsDetecting(true);
@@ -280,9 +284,10 @@ export default function ObjectDetection() {
           }}
           onTouchEnd={() => setIsDetecting(false)}
         >
-
+          
         </button>
       </div>
+
     </div>
   );
 }
