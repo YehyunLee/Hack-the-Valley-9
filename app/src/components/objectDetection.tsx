@@ -162,6 +162,29 @@ export default function ObjectDetection() {
     setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
   };
 
+  // Add slight delay to object detection to allow UI to update quickly
+  const handleMouseDown = () => {
+    setIsDetecting(true); // Update button state immediately
+    setTimeout(() => {
+      setIsDetecting(true);
+    }, 0); // Detect after UI updates
+  };
+
+  const handleMouseUp = () => {
+    setIsDetecting(false);
+  };
+
+  const handleTouchStart = () => {
+    setIsDetecting(true);
+    setTimeout(() => {
+      setIsDetecting(true);
+    }, 0);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDetecting(false);
+  };
+
   return (
     <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
       <video
