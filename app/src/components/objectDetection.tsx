@@ -8,7 +8,9 @@ export default function ObjectDetection() {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [model, setModel] = useState<any>(null);
   const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
+  const [classificationResult, setClassificationResult] = useState<string>("");
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [videoSize, setVideoSize] = useState({ width: 640, height: 480 });
   const [cameraType, setCameraType] = useState<"user" | "environment">("environment");
 
@@ -33,13 +35,9 @@ export default function ObjectDetection() {
   // Function to access the webcam
   const getWebcamStream = async () => {
     try {
-      // Stop any active video streams before switching
-      stopStream();
-
+      stopStream(); // Stop any active streams before switching
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: cameraType, // Use the selected camera (front or back)
-        },
+        video: { facingMode: cameraType }, // Use the selected camera (front or back)
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -53,11 +51,6 @@ export default function ObjectDetection() {
   useEffect(() => {
     getWebcamStream();
   }, [cameraType]);
-
-  // Function to toggle between front and back cameras
-  const toggleCamera = () => {
-    setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
-  };
 
   // Dynamically adjust video and canvas size based on screen size
   useEffect(() => {
@@ -85,24 +78,23 @@ export default function ObjectDetection() {
     if (!context) return;
 
     context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-
     const predictions = await model.detect(videoRef.current);
-
     const newDetectedObjects: string[] = [];
 
     if (overlayRef.current) {
-      overlayRef.current.innerHTML = "";
+      overlayRef.current.innerHTML = ""; // Clear previous overlays
 
-      for (const prediction of predictions) {
+      predictions.forEach((prediction: any) => {
         const [xmin, ymin, width, height] = prediction.bbox;
         const score = prediction.score;
 
-        if (score < 0.5) continue;
+        if (score < 0.5) return;
 
         if (!newDetectedObjects.includes(prediction.class)) {
           newDetectedObjects.push(prediction.class);
         }
 
+        // Create bounding box
         const box = document.createElement("div");
         box.style.position = "absolute";
         box.style.border = "2px solid #4caf50";
@@ -114,6 +106,7 @@ export default function ObjectDetection() {
         box.style.pointerEvents = "none";
         box.style.boxShadow = "0 0 8px rgba(0, 0, 0, 0.5)";
 
+        // Create label
         const label = document.createElement("span");
         label.style.position = "absolute";
         label.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
@@ -126,8 +119,10 @@ export default function ObjectDetection() {
         label.style.top = `${ymin - 24}px`;
 
         box.appendChild(label);
-        overlayRef.current.appendChild(box);
-      }
+        if (overlayRef.current) {
+          overlayRef.current.appendChild(box);
+        }
+      });
     }
 
     setDetectedObjects((prevDetectedObjects) => [
@@ -135,18 +130,22 @@ export default function ObjectDetection() {
     ]);
   };
 
-  // Handle button press and hold detection
-  const handleHoldStart = () => {
-    setIsDetecting(true);
-  };
-
-  const handleHoldEnd = () => {
-    setIsDetecting(false);
-    callReleaseFunction();
-  };
-
-  const callReleaseFunction = () => {
-    console.log("Release button. You can add more logic here.");
+  // Handle classification using LLM API
+  const classifyObjects = async (objects: string[]) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch("/api/classify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ objects }),
+      });
+      const data = await response.json();
+      setClassificationResult(data.classification);
+    } catch (error) {
+      console.error("Error classifying objects:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Continuously process frames while detecting
@@ -157,6 +156,11 @@ export default function ObjectDetection() {
     }, 100);
     return () => clearInterval(interval);
   }, [isDetecting]);
+
+  // Function to toggle between front and back cameras
+  const toggleCamera = () => {
+    setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
+  };
 
   return (
     <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
@@ -188,10 +192,23 @@ export default function ObjectDetection() {
               <li key={idx}>{obj}</li>
             ))}
           </ul>
+          <button onClick={() => classifyObjects(detectedObjects)} className="mt-2 bg-blue-500 text-white py-1 px-3 rounded">
+            Classify with LLM
+          </button>
         </div>
       )}
 
-      {/* Camera Flip Button */}
+      {isLoading ? (
+        <div className="absolute bottom-8 left-4 z-10 bg-white p-2 rounded-lg shadow-md">
+          <p>Loading...</p>
+        </div>
+      ) : classificationResult && (
+        <div className="absolute bottom-8 left-4 z-10 bg-white p-4 rounded-lg shadow-md">
+          <h4 className="font-bold">Classification Result:</h4>
+          <p>{classificationResult}</p>
+        </div>
+      )}
+
       <div className="absolute bottom-8 left-4 z-10">
         <button
           className="bg-blue-500 text-white p-2 rounded-lg shadow-md"
@@ -201,14 +218,13 @@ export default function ObjectDetection() {
         </button>
       </div>
 
-      {/* Circular Hold Button */}
       <div className="absolute bottom-8 flex justify-center w-full">
         <button
           className="w-20 h-20 bg-green-500 rounded-full shadow-lg text-white flex items-center justify-center text-xl font-bold hover:bg-green-600 transition"
-          onMouseDown={handleHoldStart}
-          onMouseUp={handleHoldEnd}
-          onTouchStart={handleHoldStart}
-          onTouchEnd={handleHoldEnd}
+          onMouseDown={() => setIsDetecting(true)}
+          onMouseUp={() => setIsDetecting(false)}
+          onTouchStart={() => setIsDetecting(true)}
+          onTouchEnd={() => setIsDetecting(false)}
         >
           Hold
         </button>
