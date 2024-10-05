@@ -9,6 +9,8 @@ export default function ObjectDetection() {
   const [model, setModel] = useState<any>(null); // To hold the loaded model
   const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
   const [isDetecting, setIsDetecting] = useState<boolean>(false); // Track detection state
+  const [videoSize, setVideoSize] = useState({ width: 640, height: 480 }); // State for video and canvas size
+  const [cameraType, setCameraType] = useState<"user" | "environment">("environment"); // State for toggling between front and back cameras
 
   // Load the model when the component mounts
   useEffect(() => {
@@ -19,19 +21,47 @@ export default function ObjectDetection() {
     loadModel();
   }, []);
 
-  // Access the webcam
-  useEffect(() => {
-    async function getWebcamStream() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+  // Function to access the webcam
+  const getWebcamStream = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: cameraType // Use the selected camera (front or back)
         }
-      } catch (err) {
-        console.error("Error accessing the webcam: ", err);
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
+    } catch (err) {
+      console.error("Error accessing the webcam: ", err);
     }
+  };
+
+  // Access the webcam when the component mounts and when the camera type changes
+  useEffect(() => {
     getWebcamStream();
+  }, [cameraType]);
+
+  // Function to toggle between front and back cameras
+  const toggleCamera = () => {
+    setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
+  };
+
+  // Dynamically adjust video and canvas size based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      const maxWidth = screenWidth < 768 ? screenWidth - 40 : 640; // Max width 640 or screen width for mobile
+      const aspectRatio = 4 / 3; // Standard aspect ratio for the video
+      const calculatedHeight = maxWidth / aspectRatio;
+
+      setVideoSize({ width: maxWidth, height: calculatedHeight });
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call initially to set the size based on the current screen
+
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   // Capture and process frame for object detection
@@ -125,21 +155,24 @@ export default function ObjectDetection() {
   }, [isDetecting]);
 
   return (
-    <div className="relative w-full md:w-[640px] h-[480px] mx-auto flex justify-center items-center">
+    <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        className="absolute top-0 left-0 w-full h-full object-cover border border-gray-300 rounded-lg shadow-lg"
+        className="absolute top-0 left-0 object-cover border border-gray-300 rounded-lg shadow-lg"
+        width={videoSize.width}
+        height={videoSize.height}
       />
       <div
         ref={overlayRef}
-        className="absolute top-0 left-0 w-full h-full pointer-events-none"
+        className="absolute top-0 left-0 pointer-events-none"
+        style={{ width: videoSize.width, height: videoSize.height }}
       />
       <canvas
         ref={canvasRef}
-        width="640"
-        height="480"
+        width={videoSize.width}
+        height={videoSize.height}
         className="hidden"
       ></canvas>
 
@@ -153,6 +186,16 @@ export default function ObjectDetection() {
           </ul>
         </div>
       )}
+
+      {/* Camera Flip Button */}
+      <div className="absolute bottom-8 left-4 z-10">
+        <button
+          className="bg-blue-500 text-white p-2 rounded-lg shadow-md"
+          onClick={toggleCamera}
+        >
+          Flip Camera
+        </button>
+      </div>
 
       {/* Circular Hold Button */}
       <div className="absolute bottom-8 flex justify-center w-full">
