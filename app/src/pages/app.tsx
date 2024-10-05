@@ -9,7 +9,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import Camera from "~/components/camera"; // Import the Camera component
+import ObjectDetection from "~/components/objectDetection"; // Import the Camera component
 
 export default function App() {
   const { data: sessionData, status } = useSession();
@@ -19,7 +19,7 @@ export default function App() {
     if (status === "loading") return; // Still loading, don't do anything yet
 
     if (!sessionData?.user) {
-      router.push("/api/auth/signin?callbackUrl=%2Fplay");
+      router.push("/api/auth/signin?callbackUrl=%2Fapp");
     }
   }, [sessionData, status, router]);
 
@@ -43,7 +43,7 @@ export default function App() {
             </button>
             <div className="mt-8">
               {/* Render the Camera component if the user is logged in */}
-              <Camera />
+              <ObjectDetection />
             </div>
           </div>
         ) : (
