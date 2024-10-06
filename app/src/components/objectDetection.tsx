@@ -12,6 +12,7 @@ export default function ObjectDetection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [model, setModel] = useState<any>(null);
+  const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
   const [classificationResult, setClassificationResult] = useState<string>("");
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -107,9 +108,7 @@ export default function ObjectDetection() {
         if (score < 0.6) return;
 
         if (!newDetectedObjects.includes(prediction.class)) {
-          if (prediction.class !== "wine glass") {
-            newDetectedObjects.push(prediction.class);
-          }
+          newDetectedObjects.push(prediction.class);
         }
 
         // Scale the bounding box coordinates based on the scaling factors
@@ -152,27 +151,31 @@ export default function ObjectDetection() {
         }
       });
     }
+    setDetectedObjects((prevDetectedObjects) => [
+      ...new Set([...prevDetectedObjects, ...newDetectedObjects]),
+    ]);
   };
 
   // Handle classification using LLM API
-  const classifyObjects = async () => {
+  const classifyObjects = async (detectedObjects: string[]) => {
+    console.log(detectedObjects);
     if (!videoRef.current || !model || !isDetecting) return;
-
+  
     // Get the video element's dimensions
     const video = videoRef.current;
     const { videoWidth, videoHeight } = video;
-
+  
     // Create a canvas element to draw the video frame
     const canvas = document.createElement('canvas');
     canvas.width = videoWidth;
     canvas.height = videoHeight;
-
+  
     const context = canvas.getContext('2d');
     if (!context) return;
-
+  
     // Draw the current video frame to the canvas
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
+  
     // Convert the canvas to a Blob
     canvas.toBlob(async (blob) => {
       if (blob) {
@@ -181,19 +184,13 @@ export default function ObjectDetection() {
           const reader = new FileReader();
           reader.onloadend = async () => {
             const base64data = reader.result; // This will be the Base64 encoded image
-
-            // Prepare the JSON payload
+  
+            // Prepare the JSON payload, including detectedObjects
             const jsonData = {
               image: base64data,
+              detectedObjects, // Pass detected objects to the backend
             };
-
-            // // Stop the video stream to freeze the webcam
-            // const stream = video.srcObject;
-            // if (stream instanceof MediaStream) {
-            //   const tracks = stream.getTracks();
-            //   tracks.forEach(track => track.stop());
-            // }
-
+  
             const response = await fetch("/api/classify", {
               method: "POST",
               headers: {
@@ -201,11 +198,14 @@ export default function ObjectDetection() {
               },
               body: JSON.stringify(jsonData),
             });
-
+  
             const data = await response.json();
             setClassificationResult(data.classification);
+  
+            // Clear detectedObjects after classification
+            setDetectedObjects([]);
           };
-
+  
           // Read the Blob as a Base64 string
           reader.readAsDataURL(blob);
         } catch (error) {
@@ -338,7 +338,8 @@ export default function ObjectDetection() {
           }}
           onMouseUp={() => {
             setIsDetecting(false);
-            classifyObjects();
+            setClassificationResult('')
+            classifyObjects(detectedObjects)
             UserScoreUpdater();
           }}
           onTouchStart={() => {
@@ -349,7 +350,8 @@ export default function ObjectDetection() {
           onTouchEnd={() => {
             setIsDetecting(false);
             UserScoreUpdater();
-            classifyObjects();
+            setClassificationResult('')
+            classifyObjects(detectedObjects)
           }}
         >
           <div className={`w-16 h-16 rounded-full ${
