@@ -17,7 +17,7 @@ export default function ObjectDetection() {
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [videoSize, setVideoSize] = useState({ width: 640, height: 480 });
-  const [cameraType, setCameraType] = useState<"user" | "environment">("user");
+  const [cameraType, setCameraType] = useState<"user" | "environment">("environment");
 
   // Load the model when the component mounts
   useEffect(() => {
