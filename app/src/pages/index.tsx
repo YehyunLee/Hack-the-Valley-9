@@ -54,7 +54,7 @@ export default function Home() {
           </div>
 
           {/* Add more space below the text */}
-          <div className="mt-12" data-aos="fade-up" data-aos-delay="900">
+          <div className="mt-12 justify-center text-align-center" data-aos="fade-up" data-aos-delay="900">
             {!session && <ObjectDetection />}
           </div>
 

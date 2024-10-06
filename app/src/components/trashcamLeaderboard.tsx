@@ -3,20 +3,28 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 const TrashcamLeaderboard: React.FC = () => {
-    const [leaderboardData, setLeaderboardData] = useState<any[]>([]);
+    const [leaderboardData, setLeaderboardData] = useState<any[]>([]); // Store leaderboard data
 
     useEffect(() => {
         const fetchLeaderboardData = async () => {
             try {
-                const response = await axios.get('trashcam');
-                // Convert object values to an array
-                const leaderboardArray = Object.values(response.data);
-                setLeaderboardData(leaderboardArray);
+                const response = await fetch('/api/db', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error fetching leaderboard');
+                }
+
+                const data = await response.json();
+                setLeaderboardData(data.leaderboard); // Set the leaderboard data
             } catch (error) {
-                console.error('Error fetching leaderboard data:', error);
+                console.error('Error fetching leaderboard:', error);
             }
         };
 
@@ -25,7 +33,7 @@ const TrashcamLeaderboard: React.FC = () => {
 
     return (
         <>
-            <table className='text-center bg-white mr-auto ml-auto w-[40vw] table-fixed border border-separate border-slate-500 text-xl rounded-xl '>
+            <table className='text-center bg-white mr-auto ml-auto w-[40vw] table-fixed border border-separate border-slate-500 text-xl rounded-xl'>
                 <thead>
                     <tr>
                         <th className='border-b-2 border-slate-500'>Rank</th>
@@ -36,9 +44,9 @@ const TrashcamLeaderboard: React.FC = () => {
                 <tbody>
                     {leaderboardData.length > 0 && leaderboardData.map((user: any, index: number) => (
                         <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{user.username}</td>
-                            <td>{user.elo}</td>
+                            <td>{index + 1}</td> {/* Rank starts at 1 */}
+                            <td>{user.name}</td>  {/* Display the username */}
+                            <td>{user.score}</td> {/* Display the score */}
                         </tr>
                     ))}
                 </tbody>

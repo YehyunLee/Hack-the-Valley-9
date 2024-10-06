@@ -22,7 +22,32 @@ export default async function handler(req: any, res: any) {
         } catch (error) {
             return res.status(500).json({ error: 'Error incrementing score' });
         }
-    } else {
+    }
+
+    // Fixed GET request for leaderboard
+    if (req.method === 'GET') {
+        try {
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    score: true
+                },
+                orderBy: {
+                    score: 'desc'
+                },
+                take: 10  // Limit the number of users returned to top 10 for the leaderboard
+            });
+
+            return res.status(200).json({ leaderboard: users }); // Clear response structure
+
+        } catch (error) {
+            console.error(error); // Log the error for debugging
+            return res.status(500).json({ error: 'Error fetching leaderboard' });
+        }
+    }
+
+    else {
         return res.status(200).json({ message: 'Error' });
     }
 }

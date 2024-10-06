@@ -9,9 +9,6 @@ const Nav: React.FC = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  // Debugging log
-  console.log("Session Data:", session);
-
   const handleSignIn = () => {
     signIn("credentials", { callbackUrl: "/app" });
   };
@@ -29,14 +26,14 @@ const Nav: React.FC = () => {
       <nav className="flex items-center justify-between h-16 font-semibold text-sm after:absolute after:inset-x-0 after:w-full after:h-12 after:shadow-hr after:z-[-1]">
         {/* Logo Section */}
         <div className="pl-6 pb-2 absolute">
-          {session && (
+
           <Image
             src={TrashcamIcon}
             alt="Logo"
             width={64}
             height={64}
           />
-          )}
+
         </div>
 
         {/* Title Section (Hidden on Mobile) */}
