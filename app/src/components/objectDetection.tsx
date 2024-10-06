@@ -264,14 +264,14 @@ export default function ObjectDetection() {
     }
   }
 
-
   return (
   <div
     className="relative w-full mx-auto flex justify-center items-center"
     style={{ width: videoSize.width, height: videoSize.height }}
   >
-    {/* FRAME from here to */}
-    <div>
+    {/* Placeholder Div to reserve space for video and overlay */}
+    <div style={{ position: 'relative', width: videoSize.width, height: videoSize.height }}>
+      {/* Video Feed */}
       <video
         ref={videoRef}
         autoPlay
@@ -280,11 +280,15 @@ export default function ObjectDetection() {
         width={videoSize.width}
         height={videoSize.height}
       />
+      
+      {/* Overlay for Object Detection */}
       <div
         ref={overlayRef}
         className="absolute top-0 left-0 pointer-events-none"
         style={{ width: videoSize.width, height: videoSize.height }}
       />
+      
+      {/* Hidden Canvas */}
       <canvas
         ref={canvasRef}
         width={videoSize.width}
@@ -292,6 +296,7 @@ export default function ObjectDetection() {
         className="hidden"
       ></canvas>
 
+      {/* Loading or Classification Result */}
       {isLoading ? (
         <div className="absolute top-2 center z-10 bg-white p-2 rounded-lg shadow-md">
           <p>Loading...</p>
@@ -305,13 +310,10 @@ export default function ObjectDetection() {
         )
       )}
     </div>
-    {/* Here */}
 
+    {/* Flip Button - Adjusted Placement */}
     <div>
-      {/* Flip button centered and placed towards the bottom and right */}
-      <div className="absolute z-10 transform -translate-x-1/2 right-16"
-        style={{ bottom: '3vh' }}  // Adjusted to use vh for consistency across devices
-      >
+      <div className="absolute bottom-[10%] z-10 transform translate-x-1/2 right-16">
         <button
           className="bg-blue-500 text-white rounded-lg shadow-md 
           text-sm sm:text-base md:text-lg 
@@ -322,13 +324,11 @@ export default function ObjectDetection() {
         </button>
       </div>
 
-      {/* Circular button centered and placed towards the bottom */}
-      <div className="absolute left-1/2 transform -translate-x-1/2 z-10"
-        style={{ bottom: '2vh' }}  // Adjusted to use vh for positioning lower
-      >
+      {/* Detection Button - Adjusted Placement */}
+      <div className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 z-10">
         <button
           className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
-          text-lg sm:text-xl md:text-2xl font-bold ${
+            text-lg sm:text-xl md:text-2xl font-bold ${
             isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
           }`}
           onMouseDown={() => {
@@ -348,11 +348,10 @@ export default function ObjectDetection() {
           }}
           onTouchEnd={() => {
             setIsDetecting(false);
-            UserScoreUpdater();
             classifyObjects();
+            UserScoreUpdater();
           }}
-        >
-        </button>
+        />
       </div>
     </div>
   </div>
