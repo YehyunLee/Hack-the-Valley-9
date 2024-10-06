@@ -265,7 +265,7 @@ export default function ObjectDetection() {
   }
 
   return (
-    <div style={{ position: "relative", width: "640px", height: "480px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <div style={{ position: "relative", width: "430px", height: "315px", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <video
         ref={videoRef}
         autoPlay
@@ -273,7 +273,6 @@ export default function ObjectDetection() {
         style={{
           width: "100%",
           height: "100%",
-          border: "1px solid black",
           position: "absolute", // Keep it absolute
           top: 0,
           left: 0,
@@ -290,7 +289,7 @@ export default function ObjectDetection() {
           pointerEvents: "none",
           zIndex: 1, // Make sure overlay is on top
         }}
-      
+
       />
       <canvas
         ref={canvasRef}
@@ -317,40 +316,39 @@ export default function ObjectDetection() {
             px-3 sm:px-4 md:px-5 py-1 sm:py-2 md:py-3"
           onClick={toggleCamera}
         >
-          Flip Camera
+          Flip
         </button>
       </div>
 
 
       <div className="absolute bottom-0 left-0 right-0 flex justify-center w-full pb-4 sm:pb-5 md:pb-6">
-  <button
-    className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
-      text-lg sm:text-xl md:text-2xl font-bold ${
-        isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
-      }`}
-    onMouseDown={() => {
-      setIsDetecting(true);
-      setIsLoading(true);
-      setClassificationResult('');
-    }}
-    onMouseUp={() => {
-      setIsDetecting(false);
-      classifyObjects();
-      UserScoreUpdater();
-    }}
-    onTouchStart={() => {
-      setIsDetecting(true);
-      setIsLoading(true);
-      setClassificationResult('');
-    }}
-    onTouchEnd={() => {
-      setIsDetecting(false);
-      UserScoreUpdater();
-      classifyObjects();
-    }}
-  >
-  </button>
-</div>
+        <button
+          className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
+      text-lg sm:text-xl md:text-2xl font-bold ${isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
+            }`}
+          onMouseDown={() => {
+            setIsDetecting(true);
+            setIsLoading(true);
+            setClassificationResult('');
+          }}
+          onMouseUp={() => {
+            setIsDetecting(false);
+            classifyObjects();
+            UserScoreUpdater();
+          }}
+          onTouchStart={() => {
+            setIsDetecting(true);
+            setIsLoading(true);
+            setClassificationResult('');
+          }}
+          onTouchEnd={() => {
+            setIsDetecting(false);
+            UserScoreUpdater();
+            classifyObjects();
+          }}
+        >
+        </button>
+      </div>
 
     </div>
   );

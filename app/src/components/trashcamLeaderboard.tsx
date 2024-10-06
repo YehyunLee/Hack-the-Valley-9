@@ -11,7 +11,10 @@ const TrashcamLeaderboard: React.FC = () => {
     useEffect(() => {
         const fetchLeaderboardData = async () => {
             try {
-                const response = await axios.get('trashcam');
+                const response = await axios.get('/api/leaderboard');
+                console.log('Leaderboard data:', response.data);
+                
+                
                 // Convert object values to an array
                 const leaderboardArray = Object.values(response.data);
                 setLeaderboardData(leaderboardArray);
