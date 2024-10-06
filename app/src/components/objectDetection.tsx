@@ -16,7 +16,7 @@ export default function ObjectDetection() {
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const [videoSize, setVideoSize] = useState({ width: 640, height: 480 });
-  const [cameraType, setCameraType] = useState<"user" | "environment">("environment");
+  const [cameraType, setCameraType] = useState<"user" | "environment">("user");
 
   // Load the model when the component mounts
   useEffect(() => {
@@ -235,7 +235,7 @@ export default function ObjectDetection() {
 
   // Function to toggle between front and back cameras
   const toggleCamera = () => {
-    setCameraType((prevType) => (prevType === "environment" ? "environment" : "user"));
+    setCameraType((prevType) => (prevType === "user" ? "user" : "environment"));
   };
 
   const UserScoreUpdater = () => {
