@@ -265,30 +265,32 @@ export default function ObjectDetection() {
   }
 
   return (
-  <div
-    className="relative w-full mx-auto flex justify-center items-center"
-    style={{ width: videoSize.width, height: videoSize.height }}
-  >
-    {/* Placeholder Div to reserve space for video and overlay */}
-    <div style={{ position: 'relative', width: videoSize.width, height: videoSize.height }}>
-      {/* Video Feed */}
+    <div style={{ position: "relative", width: "430px", height: "315px", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        className="absolute top-0 left-0 object-cover border border-gray-300 rounded-lg shadow-lg"
-        width={videoSize.width}
-        height={videoSize.height}
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "absolute", // Keep it absolute
+          top: 0,
+          left: 0,
+        }}
       />
-      
-      {/* Overlay for Object Detection */}
       <div
         ref={overlayRef}
-        className="absolute top-0 left-0 pointer-events-none"
-        style={{ width: videoSize.width, height: videoSize.height }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 1, // Make sure overlay is on top
+        }}
+
       />
-      
-      {/* Hidden Canvas */}
       <canvas
         ref={canvasRef}
         width={videoSize.width}
@@ -296,41 +298,34 @@ export default function ObjectDetection() {
         className="hidden"
       ></canvas>
 
-      {/* Loading or Classification Result */}
       {isLoading ? (
         <div className="absolute top-2 center z-10 bg-white p-2 rounded-lg shadow-md">
           <p>Loading...</p>
         </div>
-      ) : (
-        classificationResult && (
-          <div className="absolute top-2 center z-10 bg-white p-4 rounded-lg shadow-md">
-            <h4 className="font-bold">Classification Result:</h4>
-            <p>{classificationResult}</p>
-          </div>
-        )
+      ) : classificationResult && (
+        <div className="absolute top-2 center z-10 bg-white p-4 rounded-lg shadow-md">
+          <h4 className="font-bold">Classification Result:</h4>
+          <p>{classificationResult}</p>
+        </div>
       )}
-    </div>
 
-    {/* Flip Button - Adjusted Placement */}
-    <div>
-      <div className="absolute bottom-[10%] z-10 transform translate-x-1/2 right-16">
+      <div className="absolute bottom-8 right-4 z-10">
         <button
           className="bg-blue-500 text-white rounded-lg shadow-md 
-          text-sm sm:text-base md:text-lg 
-          px-3 sm:px-4 md:px-5 py-1 sm:py-2 md:py-3"
+            text-sm sm:text-base md:text-lg 
+            px-3 sm:px-4 md:px-5 py-1 sm:py-2 md:py-3"
           onClick={toggleCamera}
         >
           Flip
         </button>
       </div>
 
-      {/* Detection Button - Adjusted Placement */}
-      <div className="absolute bottom-[10%] left-1/2 transform -translate-x-1/2 z-10">
+
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center w-full pb-4 sm:pb-5 md:pb-6">
         <button
           className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
-            text-lg sm:text-xl md:text-2xl font-bold ${
-            isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
-          }`}
+      text-lg sm:text-xl md:text-2xl font-bold ${isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
+            }`}
           onMouseDown={() => {
             setIsDetecting(true);
             setIsLoading(true);
@@ -348,12 +343,13 @@ export default function ObjectDetection() {
           }}
           onTouchEnd={() => {
             setIsDetecting(false);
-            classifyObjects();
             UserScoreUpdater();
+            classifyObjects();
           }}
-        />
+        >
+        </button>
       </div>
+
     </div>
-  </div>
-);
+  );
 }
