@@ -99,7 +99,7 @@ export default function Home() {
             Compete to be in the top 5 on the leaderboard! 
             Play more, clean more, and climb to the top!
           </p>
-          <div className="mb-8" data-aos="fade-up" data-aos-delay="200">
+          <div className="mb-8">
             <TrashcamLeaderboard />
           </div>
         </section>
