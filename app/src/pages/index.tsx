@@ -23,28 +23,28 @@ export default function Home() {
 
       <div className="snap-y snap-mandatory">
         {/* Welcome Section */}
-        <section className="bg-F5FAFA snap-start flex flex-col items-center text-center py-16 px-4 md:px-8">
+        <section className="bg-DarkGreen snap-start flex flex-col items-center text-center py-16 px-4 md:px-8">
           <h1
-            className="text-1E635F text-3xl md:text-5xl font-extrabold"
+            className="text-LightGreen text-3xl md:text-5xl font-extrabold"
             data-aos="fade-up"
           >
           Not Sure Where to Throw your Trash?
           </h1>
 
           {/* Separate each question into its own div for individual animation with larger top margin */}
-          <div className="text-507371 text-lg md:text-2xl mt-4">
+          <div className="text-LightGreen text-lg md:text-2xl mt-4">
 
-            <div className="mt-12" data-aos="fade-up" data-aos-delay="300">
+            <div className=" text-LightGreen mt-12" data-aos="fade-up"  data-aos-delay="300">
               Ever wondered if you're recycling correctly?
             </div>
-            <div className="mt-12" data-aos="fade-up" data-aos-delay="500">
+            <div className="mt-12 text-LightGreen" data-aos="fade-up" data-aos-delay="500">
               Confused by local recycling rules?
             </div>
           </div>
 
           {/* New "We've got the solution!" section */}
-          <div className="mt-16 text-center" data-aos="fade-up" data-aos-delay="700">
-            <h2 className="text-1E635F text-3xl md:text-4xl font-bold">
+          <div className="mt-16 text-center text-LightGreen" data-aos="fade-up" data-aos-delay="700">
+            <h2 className="text-LightGreen text-3xl md:text-4xl font-bold">
               We've got the solution!
             </h2>
             <p className="text-507371 text-lg md:text-xl mt-4">
@@ -64,15 +64,15 @@ export default function Home() {
         </section>
 
         {/* What is Trashcam Section */}
-        <section className="bg-F5FAFA snap-start py-16 px-4 md:px-8">
+        <section className="bg-DarkGreen snap-start py-16 px-4 md:px-8">
           <div className="text-center max-w-4xl mx-auto">
             <h2
-              className="text-1E635F text-3xl md:text-4xl font-bold"
+              className="text-LightGreen text-3xl md:text-4xl font-bold"
               data-aos="fade-right"
             >
               What is Trashcam?
             </h2>
-            <div className="mt-6 space-y-6" data-aos="fade-up-right">
+            <div className="mt-6 space-y-6 text-LightGreen" data-aos="fade-up-right">
               <p className="text-lg md:text-xl">
                 Trashcam is a fun and interactive way to explore the outdoors.
               </p>
@@ -84,15 +84,15 @@ export default function Home() {
         </section>
 
         {/* Leaderboard Section */}
-        <section className="bg-F5FAFA snap-center py-16 px-4 md:px-8">
+        <section className="bg-DarkGreen snap-center py-16 px-4 md:px-8">
           <h1
-            className="text-1E635F text-3xl md:text-4xl font-bold text-center mb-4"
+            className="text-LightGreen text-3xl md:text-4xl font-bold text-center mb-4"
             data-aos="fade-up"
           >
             Leaderboard
           </h1>
           <p
-            className="text-507371 text-lg md:text-xl text-center mb-8"
+            className="text-LightGreen text-lg md:text-xl text-center mb-8"
             data-aos="fade-up"
             data-aos-delay="100"
           >
@@ -129,11 +129,11 @@ function AuthShowcase() {
         </>
       ) : (
         <>
-          <p className="text-xl md:text-2xl text-1E635F">
+          <p className="text-xl md:text-2xl text-LightGreen">
             Ready to start cleaning up? Sign in below!
           </p>
           <button
-            className="rounded-full bg-1E635F text-white px-6 py-3 md:px-10 md:py-4 font-semibold transition hover:bg-1E635F/80"
+            className="rounded-full bg-White text-DarkGreen px-6 py-3 md:px-10 md:py-4 font-black transition hover:bg-1E635F/80"
             onClick={() => signIn("credentials", { callbackUrl })}
           >
             Sign in

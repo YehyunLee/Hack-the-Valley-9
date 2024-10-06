@@ -6,14 +6,19 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+        sans: ["Exo-2", ...fontFamily.sans], // Exo 2 is now the sans font
       },
       colors: {
-        '1E635F': '#1E635F',
-        'F5FAFA': '#F5FAFA',
-        'DAF2F1' : '#DAF2F1',
-        'defafa' :'#defafa'
-        },
+
+        'DarkGreen': "#003e29",
+        'White': "#FFFFFF",
+        'LightGreen': "#aae8ba"
+
+        // '1E635F': '#1E635F',
+        // 'F5FAFA': '#F5FAFA',
+        // 'DAF2F1' : '#DAF2F1',
+        // 'defafa' :'#defafa'
+      },
       keyframes: {
         slideleft: {
           '0%': { transform: 'translateX(-100px)' },
@@ -29,9 +34,7 @@ export default {
       animation: {
         'slideleft': 'slideleft',
       },
-      
     },
-    
   },
   plugins: [],
 } satisfies Config;

@@ -38,7 +38,7 @@ const Nav: React.FC = () => {
 
         {/* Title Section (Hidden on Mobile) */}
         <button
-          className="text-1E635F text-2xl font-bold ml-[1rem] pl-20 hidden md:block" // Hidden on mobile
+          className="text-DarkGreen text-2xl font-bold ml-[1rem] pl-20 hidden md:block" // Hidden on mobile
           onClick={() => router.push("/")}
         >
           TrashCam
@@ -50,14 +50,14 @@ const Nav: React.FC = () => {
             <>
               <button
                 onClick={handleDispose}
-                className="mr-4 px-4 py-2 text-white bg-1E635F rounded-full hover:bg-1E635F/80"
+                className="mr-4 px-4 py-2 text-white bg-White rounded-full hover:bg-1E635F/80"
               >
                 Dispose 🗑
               </button>
-              <button onClick={handleSignOut} className="text-black text-base">Sign out</button>
+              <button onClick={handleSignOut} className="text-DarkGreen text-base font-black">Sign out</button>
             </>
           ) : (
-            <button onClick={handleSignIn} className="text-black text-base">Sign in</button>
+            <button onClick={handleSignIn} className="text-DarkGreen text-base font-black">Sign in</button>
           )}
 
           {/* Profile Image */}

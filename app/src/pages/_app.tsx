@@ -7,9 +7,9 @@ import 'aos/dist/aos.css';
 
 import { api } from "~/utils/api";
 
-import "~/styles/globals.css";
-// import "../output.css";
+import "~/styles/globals.css"; // Your global styles
 import { useEffect } from "react";
+import Head from 'next/head'; // Import Head to add font link
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -17,20 +17,27 @@ const MyApp: AppType<{ session: Session | null }> = ({
 }) => {
   useEffect(() => {
     AOS.init({
-         duration: 800,
-         once: false,
-       })
- }, [])
+      duration: 800,
+      once: false,
+    });
+  }, []);
 
   return (
-    <SessionProvider session={session}>
-      <div className="font-mono">
-      <Nav />
-      <main className="h-full min-h-screen">
-        <Component {...pageProps} />
-      </main>
-      </div>
-    </SessionProvider>
+    <>
+      <Head>
+        {/* Google Fonts link for Exo 2 */}
+        <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700&display=swap" rel="stylesheet" />
+      </Head>
+      <SessionProvider session={session}>
+        {/* Apply Exo 2 font */}
+        <div className="font-sans">
+          <Nav />
+          <main className="h-full min-h-screen">
+            <Component {...pageProps} />
+          </main>
+        </div>
+      </SessionProvider>
+    </>
   );
 };
 
