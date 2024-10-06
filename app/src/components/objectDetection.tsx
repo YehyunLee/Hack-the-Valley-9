@@ -12,7 +12,6 @@ export default function ObjectDetection() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const [model, setModel] = useState<any>(null);
-  const [detectedObjects, setDetectedObjects] = useState<string[]>([]);
   const [classificationResult, setClassificationResult] = useState<string>("");
   const [isDetecting, setIsDetecting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -138,7 +137,7 @@ export default function ObjectDetection() {
         label.style.color = "white";
         label.style.fontSize = "14px";
         label.style.padding = "2px 6px";
-        label.style.borderRadius = "4px";
+        label.style.borderRadius = "4px"; 
         label.innerText = `${prediction.class}: ${score.toFixed(2)}`;
         let labelX = scaledXmin;
         if (labelX > 24) {
@@ -153,29 +152,77 @@ export default function ObjectDetection() {
         }
       });
     }
-
-    setDetectedObjects((prevDetectedObjects) => [
-      ...new Set([...prevDetectedObjects, ...newDetectedObjects]),
-    ]);
   };
 
-  // Handle classification using LLM API
-  const classifyObjects = async (objects: string[]) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch("/api/classify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ objects }),
-      });
-      const data = await response.json();
-      setClassificationResult(data.classification);
-    } catch (error) {
-      console.error("Error classifying objects:", error);
-    } finally {
+   // Handle classification using LLM API
+const classifyObjects = async () => {
+  if (!videoRef.current || !model || !isDetecting) return;
+
+  // Get the video element's dimensions
+  const video = videoRef.current;
+  const { videoWidth, videoHeight } = video;
+
+  // Create a canvas element to draw the video frame
+  const canvas = document.createElement('canvas');
+  canvas.width = videoWidth;
+  canvas.height = videoHeight;
+
+  const context = canvas.getContext('2d');
+  if (!context) return;
+
+  // Draw the current video frame to the canvas
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  // Convert the canvas to a Blob
+  canvas.toBlob(async (blob) => {
+    if (blob) {
+      try {
+        // Convert Blob to Base64
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+          const base64data = reader.result; // This will be the Base64 encoded image
+
+          // Prepare the JSON payload
+          const jsonData = {
+            image: base64data,
+          };
+
+          // // Stop the video stream to freeze the webcam
+          // const stream = video.srcObject;
+          // if (stream instanceof MediaStream) {
+          //   const tracks = stream.getTracks();
+          //   tracks.forEach(track => track.stop());
+          // }
+
+          const response = await fetch("/api/classify", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(jsonData),
+          });
+
+          const data = await response.json();
+          setClassificationResult(data.classification);
+        };
+
+        // Read the Blob as a Base64 string
+        reader.readAsDataURL(blob);
+      } catch (error) {
+        console.error("Error classifying objects:", error);
+      }
+    } else {
+      console.error("Failed to create Blob from canvas");
       setIsLoading(false);
     }
-  };
+  }, "image/jpeg");
+};
+
+  useEffect(() => {
+    if (classificationResult !== "") {
+      setIsLoading(false);
+    }
+  }, [classificationResult]);
 
   // Continuously process frames while detecting
   useEffect(() => {
@@ -189,29 +236,6 @@ export default function ObjectDetection() {
   // Function to toggle between front and back cameras
   const toggleCamera = () => {
     setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
-  };
-
-  // Add slight delay to object detection to allow UI to update quickly
-  const handleMouseDown = () => {
-    setIsDetecting(true); // Update button state immediately
-    setTimeout(() => {
-      setIsDetecting(true);
-    }, 0); // Detect after UI updates
-  };
-
-  const handleMouseUp = () => {
-    setIsDetecting(false);
-  };
-
-  const handleTouchStart = () => {
-    setIsDetecting(true);
-    setTimeout(() => {
-      setIsDetecting(true);
-    }, 0);
-  };
-
-  const handleTouchEnd = () => {
-    setIsDetecting(false);
   };
 
   const UserScoreUpdater = () => {
@@ -239,7 +263,7 @@ export default function ObjectDetection() {
       handleIncrementScore(userId);
     }
   }
-
+  
   return (
     <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
       <video
@@ -261,20 +285,6 @@ export default function ObjectDetection() {
         height={videoSize.height}
         className="hidden"
       ></canvas>
-
-      {detectedObjects.length > 0 && (
-        <div className="absolute bottom-5 left-4 z-10 bg-white bg-opacity-80 p-4 rounded-lg shadow-md">
-          <h4 className="font-bold text-lg text-gray-700">Detected Objects:</h4>
-          <ul className="text-gray-600">
-            {detectedObjects.map((obj, idx) => (
-              <li key={idx}>{obj}</li>
-            ))}
-          </ul>
-          <button onClick={() => classifyObjects(detectedObjects)} className="mt-2 bg-blue-500 text-white py-1 px-3 rounded">
-            Classify with LLM
-          </button>
-        </div>
-      )}
 
       {isLoading ? (
         <div className="absolute top-2 center z-10 bg-white p-2 rounded-lg shadow-md">
@@ -306,24 +316,24 @@ export default function ObjectDetection() {
             }`}
           onMouseDown={() => {
             setIsDetecting(true);
-            setDetectedObjects([]); // Reset detected objects when detecting starts
+            setIsLoading(true);
+            setClassificationResult('')
           }}
           onMouseUp={() => {
-            setIsDetecting(false)
+            setIsDetecting(false);
+            classifyObjects()
             UserScoreUpdater();
-          }
-          }
+          }}
           onTouchStart={() => {
             setIsDetecting(true);
-            setDetectedObjects([]); // Reset detected objects when detecting starts
+            setIsLoading(true);
+            setClassificationResult('')
           }}
           onTouchEnd={() => {
-            setIsDetecting(false)
+            setIsDetecting(false);
             UserScoreUpdater();
-          }
-
-          }
-        >
+            classifyObjects()
+          }}
           
         </button>
       </div>
