@@ -9,9 +9,6 @@ const Nav: React.FC = () => {
   const { data: session } = useSession();
   const router = useRouter();
 
-  // Debugging log
-  console.log("Session Data:", session);
-
   const handleSignIn = () => {
     signIn("credentials", { callbackUrl: "/app" });
   };
@@ -64,7 +61,7 @@ const Nav: React.FC = () => {
           )}
 
           {/* Profile Image */}
-          <div className="ml-4 pr-3">
+          <div className="ml-4 pr-4">
             {session && (
               <Image
                 src={(session.user as DiscordProfile).image}

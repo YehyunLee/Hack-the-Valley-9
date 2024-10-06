@@ -265,8 +265,7 @@ export default function ObjectDetection() {
   }
 
   return (
-    <div style={{ position: "relative", width: videoSize.width, height: videoSize.height,
-    display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <div style={{ position: "relative", width: "640px", height: "480px", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <video
         ref={videoRef}
         autoPlay
