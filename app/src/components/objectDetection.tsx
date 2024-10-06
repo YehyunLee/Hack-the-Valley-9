@@ -265,19 +265,36 @@ export default function ObjectDetection() {
   }
 
   return (
-    <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
+    <div style={{ position: "relative", width: "640px", height: "480px", display: "flex", justifyContent: "center", alignItems: "center" }}>
       <video
         ref={videoRef}
         autoPlay
         playsInline
-        className="absolute top-0 left-0 object-cover border border-gray-300 rounded-lg shadow-lg"
-        width={videoSize.width}
-        height={videoSize.height}
+        style={{
+          width: "100%",
+          height: "100%",
+          border: "1px solid black",
+          position: "absolute", // Keep it absolute
+          top: 0,
+          left: 0,
+        }}
       />
       <div
         ref={overlayRef}
-        className="absolute top-0 left-0 pointer-events-none"
-        style={{ width: videoSize.width, height: videoSize.height }}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          pointerEvents: "none",
+          zIndex: 1, // Make sure overlay is on top
+        }}
+      
+      
+      
+      
+      
       />
       <canvas
         ref={canvasRef}
