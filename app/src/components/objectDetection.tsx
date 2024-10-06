@@ -326,34 +326,35 @@ export default function ObjectDetection() {
       </div>
 
 
-      <div className="absolute bottom-5 flex justify-center w-full">
-        <button
-          className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
-            text-lg sm:text-xl md:text-2xl font-bold ${isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
-            }`}
-          onMouseDown={() => {
-            setIsDetecting(true);
-            setIsLoading(true);
-            setClassificationResult('')
-          }}
-          onMouseUp={() => {
-            setIsDetecting(false);
-            classifyObjects()
-            UserScoreUpdater();
-          }}
-          onTouchStart={() => {
-            setIsDetecting(true);
-            setIsLoading(true);
-            setClassificationResult('')
-          }}
-          onTouchEnd={() => {
-            setIsDetecting(false);
-            UserScoreUpdater();
-            classifyObjects()
-          }}
-        >
-        </button>
-      </div>
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center w-full pb-4 sm:pb-5 md:pb-6">
+  <button
+    className={`w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full shadow-lg text-white flex items-center justify-center 
+      text-lg sm:text-xl md:text-2xl font-bold ${
+        isDetecting ? "bg-green-500 hover:bg-green-600" : "bg-transparent border-4 border-white"
+      }`}
+    onMouseDown={() => {
+      setIsDetecting(true);
+      setIsLoading(true);
+      setClassificationResult('');
+    }}
+    onMouseUp={() => {
+      setIsDetecting(false);
+      classifyObjects();
+      UserScoreUpdater();
+    }}
+    onTouchStart={() => {
+      setIsDetecting(true);
+      setIsLoading(true);
+      setClassificationResult('');
+    }}
+    onTouchEnd={() => {
+      setIsDetecting(false);
+      UserScoreUpdater();
+      classifyObjects();
+    }}
+  >
+  </button>
+</div>
 
     </div>
   );
