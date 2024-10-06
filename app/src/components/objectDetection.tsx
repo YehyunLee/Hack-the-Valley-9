@@ -265,7 +265,8 @@ export default function ObjectDetection() {
   }
 
   return (
-    <div style={{ position: "relative", width: "640px", height: "480px", display: "flex", justifyContent: "center", alignItems: "center" }}>
+    <div style={{ position: "relative", width: "100%", height: "100%",
+    display: "flex", justifyContent: "center", alignItems: "center" }}>
       <video
         ref={videoRef}
         autoPlay
@@ -290,10 +291,6 @@ export default function ObjectDetection() {
           pointerEvents: "none",
           zIndex: 1, // Make sure overlay is on top
         }}
-      
-      
-      
-      
       
       />
       <canvas
