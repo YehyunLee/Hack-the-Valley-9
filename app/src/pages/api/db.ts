@@ -22,7 +22,32 @@ export default async function handler(req: any, res: any) {
         } catch (error) {
             return res.status(500).json({ error: 'Error incrementing score' });
         }
-    } else {
+    }
+    
+    // leaderboard
+    if (req.method === 'GET' && req.body.task === 'leaderboard') {
+        try {
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    score: true
+                },
+                orderBy: {
+                    score: 'desc'
+                }
+            });
+            return res.status(200).json({ users });
+            // will this contain score, name? A. Yes
+        } catch (error) {
+            return res.status(500).json({ error: 'Error fetching leaderboard' });
+        }
+    }
+    
+    
+    
+    
+    else {
         return res.status(200).json({ message: 'Error' });
     }
 }

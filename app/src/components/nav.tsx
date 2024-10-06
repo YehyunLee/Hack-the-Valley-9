@@ -26,14 +26,14 @@ const Nav: React.FC = () => {
       <nav className="flex items-center justify-between h-16 font-semibold text-sm after:absolute after:inset-x-0 after:w-full after:h-12 after:shadow-hr after:z-[-1]">
         {/* Logo Section */}
         <div className="pl-6 pb-2 absolute">
-          {session && (
+
           <Image
             src={TrashcamIcon}
             alt="Logo"
             width={64}
             height={64}
           />
-          )}
+
         </div>
 
         {/* Title Section (Hidden on Mobile) */}
@@ -61,7 +61,7 @@ const Nav: React.FC = () => {
           )}
 
           {/* Profile Image */}
-          <div className="ml-4 pr-4">
+          <div className="ml-4 pr-3">
             {session && (
               <Image
                 src={(session.user as DiscordProfile).image}
