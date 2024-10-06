@@ -270,9 +270,9 @@ export default function ObjectDetection() {
     className="relative bg-black w-full h-full max-h-screen overflow-hidden"
     style={{ 
       width: videoSize.width, 
-      height: videoSize.height,
+      height: videoSize.height * 2,
       maxWidth: "100vw",
-      maxHeight: "100vh"
+      maxHeight: "200vh"
     }}
   >
     <video
