@@ -265,7 +265,7 @@ export default function ObjectDetection() {
   }
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%",
+    <div style={{ position: "relative", width: videoSize.width, height: videoSize.height,
     display: "flex", justifyContent: "center", alignItems: "center" }}>
       <video
         ref={videoRef}
