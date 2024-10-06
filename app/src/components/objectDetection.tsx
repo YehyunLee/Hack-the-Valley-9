@@ -265,8 +265,13 @@ export default function ObjectDetection() {
   }
 
   return (
-    <div style={{ position: "relative", width: "430px", height: "315px", display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <video
+    // Expand the scale of the video feed
+
+    // 430x315 for mobile
+    // 640x480 for desktop
+    <div style={{ width: videoSize.width, height: videoSize.height }} className="relative"
+    >
+    <video
         ref={videoRef}
         autoPlay
         playsInline
