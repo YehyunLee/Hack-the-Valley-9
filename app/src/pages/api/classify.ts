@@ -1,75 +1,108 @@
-// pages/api/classify.ts
-
 import { NextApiRequest, NextApiResponse } from 'next';
-import fs from 'fs';
-import path from 'path';
-import { GoogleAIFileManager } from '@google/generative-ai/server';
+import { Storage } from '@google-cloud/storage';
+import vision from '@google-cloud/vision';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import path from 'path';
+
+// Create clients using your service account key
+const storage = new Storage({
+    keyFilename: path.join(process.cwd(), 'phrasal-period-437803-u6-13300abd9c5a.json'),
+});
+
+const visionClient = new vision.ImageAnnotatorClient({
+    keyFilename: path.join(process.cwd(), 'phrasal-period-437803-u6-13300abd9c5a.json'),
+});
+
+const bucketName = 'trashcam'; // Replace with your GCS bucket name
 
 export default async function classifyObjects(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'API key missing' });
-    }
-
     // Ensure the request has an image
     if (!req.body || !req.body.image) {
         return res.status(400).json({ error: 'No image provided' });
     }
-
     try {
-        console.time("Classification Backend Time");
-
-        // Remove the data URL prefix if present and get the Base64 string
+        // Extract the Base64 image data
         const base64Image = req.body.image.split(',')[1];
 
-        // Define a temporary file path
-        const tempFilePath = path.join(process.cwd(), 'temp', 'captured_frame.jpeg');
+        // Convert Base64 to Buffer
+        const imageBuffer = Buffer.from(base64Image, 'base64');
 
-        // Write the Base64 image to a file
-        const buffer = Buffer.from(base64Image, 'base64');
-        fs.writeFileSync(tempFilePath, buffer);
+        // Create a unique filename
+        const filename = `uploaded_image_${Date.now()}.jpeg`;
 
-        const fileManager = new GoogleAIFileManager(apiKey);
-        
-        // Upload the image to Google Generative AI
-        const uploadResult = await fileManager.uploadFile(tempFilePath, {
-            mimeType: 'image/jpeg',
+        // Upload the image to GCS
+        const gcsFile = storage.bucket(bucketName).file(filename);
+        await gcsFile.save(imageBuffer, {
+            contentType: 'image/jpeg',
+            resumable: false,
         });
-        fs.unlinkSync(tempFilePath);
+
+        // Prepare the GCS image URI
+        const fileUri = `gs://${bucketName}/${filename}`;
+
+        // Use Cloud Vision API to detect objects
+        const [result] = await visionClient.annotateImage({
+            image: { source: { imageUri: fileUri } },
+            features: [{ type: 'OBJECT_LOCALIZATION' }] // Specify the feature type
+        });
+
+        // Check if localizedObjectAnnotations exists
+        if (!result || !result.localizedObjectAnnotations) {
+            return res.status(500).json({ error: 'No objects detected in the image' });
+        }
+
+
+        const objects = result.localizedObjectAnnotations;
+
+        // Prepare object names for the prompt
+        const objectsResponse = objects.map(obj => obj.name).join(', ');
+        console.log(objectsResponse);
+        console.log(req.body.detectedObjects.join(' '))
+        // Prepare the prompt for the Gemini API
+        const prompt = `
+            You receive have two inputs:
+
+            Main computer vision: ${req.body.detectedObjects.join(' ')}.
+            Secondary computer vision: ${objectsResponse}.
+
+            Your task is to:
+            Identify objects that appear in both the main and secondary computer vision.
+            Focus only on objects that are commonly discarded as trash, such as packaging, food-related items, or household waste. Ignore persons and electronics (like laptops, TVs, phones, keyboards etc.).
+            If there are something in secondary computer vision result that is missing in main computer vision and the object
+            is commonly discarded as trash, include it.
+
+            Assumptions:
+            Assume that bottles are plastic bottles. For each trash object, determine the category of waste it belongs to: Compost, Recyclables, or Inorganic Waste.
+
+            Provide your response in the following format:
+            {Object name}: {Types of Trash}
+
+            Example Answer:
+            Bottle: Recyclables
+            Pizza: Compost
+
+            REMINDER: Don't do a full breakdown in the answer!!
+
+            If there is nothing in both, just say "keep scanning!"
+        `;
+        console.log(prompt);
+        // Create an instance of the GoogleGenerativeAI client
+        const apiKey = process.env.GEMINI_API_KEY; // Your Gemini API Key
+        if (!apiKey) return;
         const genAI = new GoogleGenerativeAI(apiKey);
         const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-        // Generate the content to extract objects from the image
-        const result = await model.generateContent([
-            "Tell me the objects in this image. Tell me the object name, xmin, ymin, width and height. Don't give me any extra information.",
-            {
-                fileData: {
-                    fileUri: uploadResult.file.uri,
-                    mimeType: uploadResult.file.mimeType,
-                },
-            },
-        ]);
-
-        const objectsResponse = await result.response.text();
-
-        // Prepare the second prompt for classification
-        const model2 = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-        const prompt = `From these objects: ${objectsResponse},
-            only look at things that are thrown in the trash daily or very usually and not occasional, so ignore any objects value such
-            as person and electronics (laptop, refrigerator, tv, cell phone, hair dryer, remote), ignore fire hydrants, 
-            wine glass, donuts, and tell me where this trash should go: compost or recyclables or inorganic waste.
-            If it's a bottle, assume it's a plastic bottle. Give me the answer in this format "Bottle: Recyclables". Don't give any extra information.`;
-
-        const result2 = await model2.generateContent(prompt);
+        // Call the Gemini API with the prepared prompt
+        const result2 = await model.generateContent(prompt);
         const classificationResponse = await result2.response.text();
 
         // Return the classification result
         res.status(200).json({ classification: classificationResponse });
+
     } catch (error) {
         console.error("Error classifying objects:", error);
         res.status(500).json({ error: 'Error classifying objects' });
