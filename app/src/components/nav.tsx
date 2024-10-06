@@ -25,8 +25,7 @@ const Nav: React.FC = () => {
     <header className="sticky top-0 z-10 pt-6 pb-5 backdrop-filter backdrop-blur dark:bg-primary dark:text-white">
       <nav className="flex items-center justify-between h-16 font-semibold text-sm after:absolute after:inset-x-0 after:w-full after:h-12 after:shadow-hr after:z-[-1]">
         {/* Logo Section */}
-        <div className="pl-6 pb-2 absolute">
-
+        <div className="pl-6 pb-2 absolute" onClick={() => router.push("/")}>
           <Image
             src={TrashcamIcon}
             alt="Logo"
