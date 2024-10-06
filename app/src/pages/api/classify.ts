@@ -76,22 +76,24 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
         console.log(req.body.detectedObjects.join(' '))
         // Prepare the prompt for the Gemini API
         const prompt = `
-            You receive have two inputs:
+            Here are the main computer vision and secondary computer vision outputs:
 
-            Main computer vision: ${req.body.detectedObjects.join(' ')}.
-            Secondary computer vision: ${objectsResponse}.
+            Main computer vision: ${objectsResponse}
+            Secondary computer vision: ${req.body.detectedObjects.join(' ')}
 
             Your task is to:
             Identify objects that appear in both the main and secondary computer vision.
             Focus only on objects that are commonly discarded as trash, such as packaging, food-related items, or household waste. Ignore persons and electronics (like laptops, TVs, phones, keyboards etc.).
-            If there are something in secondary computer vision result that is missing in main computer vision and the object
-            is commonly discarded as trash, include it.
+            If there is something in main computer vision result that is missing in secondary computer vision and the object
+            is commonly discarded as trash, include it. Make sure to do this.
+
 
             Assumptions:
             Assume that bottles are plastic bottles. For each trash object, determine the category of waste it belongs to: Compost, Recyclables, or Inorganic Waste.
 
             Provide your response in the following format:
             {Object name}: {Types of Trash}
+            Make sure to not add any extra text than that.
 
             Example Answer:
             Bottle: Recyclables
@@ -99,7 +101,7 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
 
             REMINDER: Don't do a full breakdown in the answer!!
 
-            If there is nothing in both, just say "keep scanning!"
+            If both computer visions are empty, just say "keep scanning!"
         `;
         console.log(prompt);
         // Create an instance of the GoogleGenerativeAI client
