@@ -105,7 +105,7 @@ export default function ObjectDetection() {
         const [xmin, ymin, width, height] = prediction.bbox;
         const score = prediction.score;
 
-        if (score < 0.6) return;
+        if (score < 0) return;
 
         if (!newDetectedObjects.includes(prediction.class)) {
           newDetectedObjects.push(prediction.class);
