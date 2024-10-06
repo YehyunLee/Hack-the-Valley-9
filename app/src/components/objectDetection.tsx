@@ -267,11 +267,12 @@ export default function ObjectDetection() {
 
   return (
     <div
-      className="relative w-full mx-auto flex justify-center items-center"
-      style={{ width: videoSize.width, height: videoSize.height }}
+      
     >
       {/* FRAME from here to */}
-      <div>
+      <div
+className="relative w-full mx-auto flex justify-center items-center"
+      style={{ width: videoSize.width, height: videoSize.height }}>
         <video
           ref={videoRef}
           autoPlay
