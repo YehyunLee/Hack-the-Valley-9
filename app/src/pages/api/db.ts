@@ -23,9 +23,9 @@ export default async function handler(req: any, res: any) {
             return res.status(500).json({ error: 'Error incrementing score' });
         }
     }
-    
-    // leaderboard
-    if (req.method === 'GET' && req.body.task === 'leaderboard') {
+
+    // Fixed GET request for leaderboard
+    if (req.method === 'GET') {
         try {
             const users = await prisma.user.findMany({
                 select: {
@@ -35,18 +35,18 @@ export default async function handler(req: any, res: any) {
                 },
                 orderBy: {
                     score: 'desc'
-                }
+                },
+                take: 10  // Limit the number of users returned to top 10 for the leaderboard
             });
-            return res.status(200).json({ users });
-            // will this contain score, name? A. Yes
+
+            return res.status(200).json({ leaderboard: users }); // Clear response structure
+
         } catch (error) {
+            console.error(error); // Log the error for debugging
             return res.status(500).json({ error: 'Error fetching leaderboard' });
         }
     }
-    
-    
-    
-    
+
     else {
         return res.status(200).json({ message: 'Error' });
     }
