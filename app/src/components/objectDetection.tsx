@@ -235,7 +235,7 @@ export default function ObjectDetection() {
 
   // Function to toggle between front and back cameras
   const toggleCamera = () => {
-    setCameraType((prevType) => (prevType === "user" ? "user" : "environment"));
+    setCameraType((prevType) => (prevType === "user" ? "environment" : "user"));
   };
 
   const UserScoreUpdater = () => {
