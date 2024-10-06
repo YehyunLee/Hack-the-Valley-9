@@ -137,7 +137,7 @@ export default function ObjectDetection() {
         label.style.color = "white";
         label.style.fontSize = "14px";
         label.style.padding = "2px 6px";
-        label.style.borderRadius = "4px"; 
+        label.style.borderRadius = "4px";
         label.innerText = `${prediction.class}: ${score.toFixed(2)}`;
         let labelX = scaledXmin;
         if (labelX > 24) {
@@ -154,69 +154,69 @@ export default function ObjectDetection() {
     }
   };
 
-   // Handle classification using LLM API
-const classifyObjects = async () => {
-  if (!videoRef.current || !model || !isDetecting) return;
+  // Handle classification using LLM API
+  const classifyObjects = async () => {
+    if (!videoRef.current || !model || !isDetecting) return;
 
-  // Get the video element's dimensions
-  const video = videoRef.current;
-  const { videoWidth, videoHeight } = video;
+    // Get the video element's dimensions
+    const video = videoRef.current;
+    const { videoWidth, videoHeight } = video;
 
-  // Create a canvas element to draw the video frame
-  const canvas = document.createElement('canvas');
-  canvas.width = videoWidth;
-  canvas.height = videoHeight;
+    // Create a canvas element to draw the video frame
+    const canvas = document.createElement('canvas');
+    canvas.width = videoWidth;
+    canvas.height = videoHeight;
 
-  const context = canvas.getContext('2d');
-  if (!context) return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
 
-  // Draw the current video frame to the canvas
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    // Draw the current video frame to the canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-  // Convert the canvas to a Blob
-  canvas.toBlob(async (blob) => {
-    if (blob) {
-      try {
-        // Convert Blob to Base64
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64data = reader.result; // This will be the Base64 encoded image
+    // Convert the canvas to a Blob
+    canvas.toBlob(async (blob) => {
+      if (blob) {
+        try {
+          // Convert Blob to Base64
+          const reader = new FileReader();
+          reader.onloadend = async () => {
+            const base64data = reader.result; // This will be the Base64 encoded image
 
-          // Prepare the JSON payload
-          const jsonData = {
-            image: base64data,
+            // Prepare the JSON payload
+            const jsonData = {
+              image: base64data,
+            };
+
+            // // Stop the video stream to freeze the webcam
+            // const stream = video.srcObject;
+            // if (stream instanceof MediaStream) {
+            //   const tracks = stream.getTracks();
+            //   tracks.forEach(track => track.stop());
+            // }
+
+            const response = await fetch("/api/classify", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(jsonData),
+            });
+
+            const data = await response.json();
+            setClassificationResult(data.classification);
           };
 
-          // // Stop the video stream to freeze the webcam
-          // const stream = video.srcObject;
-          // if (stream instanceof MediaStream) {
-          //   const tracks = stream.getTracks();
-          //   tracks.forEach(track => track.stop());
-          // }
-
-          const response = await fetch("/api/classify", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(jsonData),
-          });
-
-          const data = await response.json();
-          setClassificationResult(data.classification);
-        };
-
-        // Read the Blob as a Base64 string
-        reader.readAsDataURL(blob);
-      } catch (error) {
-        console.error("Error classifying objects:", error);
+          // Read the Blob as a Base64 string
+          reader.readAsDataURL(blob);
+        } catch (error) {
+          console.error("Error classifying objects:", error);
+        }
+      } else {
+        console.error("Failed to create Blob from canvas");
+        setIsLoading(false);
       }
-    } else {
-      console.error("Failed to create Blob from canvas");
-      setIsLoading(false);
-    }
-  }, "image/jpeg");
-};
+    }, "image/jpeg");
+  };
 
   useEffect(() => {
     if (classificationResult !== "") {
@@ -263,7 +263,7 @@ const classifyObjects = async () => {
       handleIncrementScore(userId);
     }
   }
-  
+
   return (
     <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
       <video
@@ -334,7 +334,7 @@ const classifyObjects = async () => {
             UserScoreUpdater();
             classifyObjects()
           }}
-          
+        >
         </button>
       </div>
 
