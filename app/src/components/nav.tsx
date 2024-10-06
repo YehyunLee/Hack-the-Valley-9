@@ -64,7 +64,7 @@ const Nav: React.FC = () => {
           )}
 
           {/* Profile Image */}
-          <div className="ml-4 pr-4">
+          <div className="ml-4 pr-3">
             {session && (
               <Image
                 src={(session.user as DiscordProfile).image}

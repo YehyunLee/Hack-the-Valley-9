@@ -31,7 +31,7 @@ export default function App() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="flex flex-col min-h-screen p-4 ">
+      <div className="flex flex-col min-h-screen p-4 items-center justify-between ">
         {sessionData ? (
           <div className="text-center">
             <h1 className="text-3xl font-bold mb-4 sm:text-2xl">
