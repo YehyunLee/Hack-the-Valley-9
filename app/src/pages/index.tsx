@@ -70,11 +70,11 @@ export default function Home() {
               className="text-1E635F text-3xl md:text-4xl font-bold"
               data-aos="fade-right"
             >
-              What is Trashcam?
+              What is TrashCam?
             </h2>
             <div className="mt-6 space-y-6" data-aos="fade-up-right">
               <p className="text-lg md:text-xl">
-                Trashcam is a fun and interactive way to explore the outdoors.
+                TrashCam is the best way to reduce your carbon footprint even if you're unsure how!
               </p>
               <p className="text-lg md:text-xl">
                 Play, clean up trash, and contribute to a cleaner environment!
