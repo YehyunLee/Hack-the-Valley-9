@@ -5,12 +5,24 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import path from 'path';
 
 // Create clients using your service account key
+const base64Key = process.env.GOOGLE_API_KEY_BASE64;
+if (!base64Key) {
+  throw new Error("GOOGLE_API_KEY_BASE64 environment variable is not set.");
+}
+
+// Decode the Base64-encoded JSON key
+const credentials = JSON.parse(
+  Buffer.from(base64Key, 'base64').toString('utf-8')
+);
+
+// Create Google Cloud Storage client using the credentials
 const storage = new Storage({
-    keyFilename: path.join(process.cwd(), 'phrasal-period-437803-u6-13300abd9c5a.json'),
+  credentials, // Use the decoded credentials
 });
 
+// Create Google Cloud Vision client using the credentials
 const visionClient = new vision.ImageAnnotatorClient({
-    keyFilename: path.join(process.cwd(), 'phrasal-period-437803-u6-13300abd9c5a.json'),
+  credentials, // Use the decoded credentials
 });
 
 const bucketName = 'trashcam'; // Replace with your GCS bucket name
