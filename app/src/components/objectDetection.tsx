@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import * as cocoSsd from "@tensorflow-models/coco-ssd";
 import "@tensorflow/tfjs";
+import axios from 'axios';
 
 export default function ObjectDetection() {
+  const { data: session } = useSession();
+  const isUserAuthenticated = !!session?.user; // why double ! A. It's a shorthand way to convert a value to a boolean
+  const userId = session?.user?.id as string;
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -209,6 +214,32 @@ export default function ObjectDetection() {
     setIsDetecting(false);
   };
 
+  const UserScoreUpdater = () => {
+    const handleIncrementScore = async (userId: string) => {
+      try {
+        const response = await axios.post('/api/db', {
+          task: 'scoreIncrement',
+          id: userId,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.data.success) {
+          console.log("Score updated successfully!");
+        } else {
+          console.error("Failed to update score:", response.data.error);
+        }
+      } catch (error) {
+        console.error("Failed to update score:", error);
+      }
+    };
+    if (isUserAuthenticated) {
+      handleIncrementScore(userId);
+    }
+  }
+
   return (
     <div className="relative w-full mx-auto flex justify-center items-center" style={{ width: videoSize.width, height: videoSize.height }}>
       <video
@@ -277,12 +308,21 @@ export default function ObjectDetection() {
             setIsDetecting(true);
             setDetectedObjects([]); // Reset detected objects when detecting starts
           }}
-          onMouseUp={() => setIsDetecting(false)}
+          onMouseUp={() => {
+            setIsDetecting(false)
+            UserScoreUpdater();
+          }
+          }
           onTouchStart={() => {
             setIsDetecting(true);
             setDetectedObjects([]); // Reset detected objects when detecting starts
           }}
-          onTouchEnd={() => setIsDetecting(false)}
+          onTouchEnd={() => {
+            setIsDetecting(false)
+            UserScoreUpdater();
+          }
+
+          }
         >
           
         </button>
