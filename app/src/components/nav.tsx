@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import React from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import type { DiscordProfile } from "next-auth/providers/discord";
-import TrashcamIcon from "./TrashCamIcon.jpg";
+import TrashcamIcon from "./logo.png";
 
 const Nav: React.FC = () => {
   const { data: session } = useSession();
   const router = useRouter();
+
+  // Debugging log
+  console.log("Session Data:", session);
 
   const handleSignIn = () => {
     signIn("credentials", { callbackUrl: "/app" });
@@ -24,18 +25,17 @@ const Nav: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-10 pt-6 pb-5 backdrop-filter backdrop-blur dark:bg-primary dark:text-white">
+    <header className="sticky top-0 z-10 pt-6 pb-5 backdrop-filter backdrop-blur dark:bg-primary  dark:text-white">
       <nav className="flex items-center justify-between h-16 font-semibold text-sm after:absolute after:inset-x-0 after:w-full after:h-12 after:shadow-hr after:z-[-1]">
         {/* Logo Section */}
         <div className="pl-6 pb-2 absolute">
-          {session && (
-            <Image
-              src="/logo.png"
-              alt="Logo"
-              width={64}
-              height={64}
-            />
-          )}
+          {/* Render the logo regardless of the session state */}
+          <Image
+            src={TrashcamIcon}
+            alt="Logo"
+            width={64}
+            height={64}
+          />
         </div>
 
         {/* Title Section (Hidden on Mobile) */}
@@ -56,10 +56,10 @@ const Nav: React.FC = () => {
               >
                 Dispose 🗑
               </button>
-              <button onClick={handleSignOut} className="text-black">Sign out</button>
+              <button onClick={handleSignOut} className="text-black text-base">Sign out</button>
             </>
           ) : (
-            <button onClick={handleSignIn} className="text-black">Sign in</button>
+            <button onClick={handleSignIn} className="text-black text-base">Sign in</button>
           )}
 
           {/* Profile Image */}

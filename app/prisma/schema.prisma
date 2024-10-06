@@ -45,6 +45,7 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
+    score         Int       @default(0)
 }
 
 model VerificationToken {

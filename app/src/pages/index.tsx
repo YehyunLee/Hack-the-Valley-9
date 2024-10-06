@@ -2,9 +2,16 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import TrashcamLeaderboard from "../components/trashcamLeaderboard";
 import ObjectDetection from "~/components/objectDetection";
+import { useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 export default function Home() {
   const { data: session } = useSession();
+
+  useEffect(() => {
+    AOS.init({ duration: 1000 });
+  }, []);
 
   return (
     <>
@@ -18,25 +25,40 @@ export default function Home() {
         {/* Welcome Section */}
         <section className="bg-F5FAFA snap-start flex flex-col items-center text-center py-16 px-4 md:px-8">
           <h1
-            className="text-1E635F text-4xl md:text-6xl font-extrabold"
+            className="text-1E635F text-3xl md:text-5xl font-extrabold"
             data-aos="fade-up"
           >
-            Welcome to Trashcam!
+          Not Sure Where to Throw your Trash?
           </h1>
-          <p
-            className="text-507371 text-lg md:text-2xl mt-4"
-            data-aos="fade-up"
-            data-aos-delay="200"
-          >
-            Join the fun and start exploring!
-          </p>
+
+          {/* Separate each question into its own div for individual animation with larger top margin */}
+          <div className="text-507371 text-lg md:text-2xl mt-4">
+
+            <div className="mt-12" data-aos="fade-up" data-aos-delay="300">
+              Ever wondered if you're recycling correctly?
+            </div>
+            <div className="mt-12" data-aos="fade-up" data-aos-delay="500">
+              Confused by local recycling rules?
+            </div>
+          </div>
+
+          {/* New "We've got the solution!" section */}
+          <div className="mt-16 text-center" data-aos="fade-up" data-aos-delay="700">
+            <h2 className="text-1E635F text-3xl md:text-4xl font-bold">
+              We've got the solution!
+            </h2>
+            <p className="text-507371 text-lg md:text-xl mt-4">
+              Our app uses real-time object recognition to help you sort your trash
+              instantly, making waste management easier and more eco-friendly.
+            </p>
+          </div>
 
           {/* Add more space below the text */}
-          <div className="mt-12" data-aos="fade-up" data-aos-delay="300">
+          <div className="mt-12" data-aos="fade-up" data-aos-delay="900">
             {!session && <ObjectDetection />}
           </div>
 
-          <div className="mt-8" data-aos="fade-up" data-aos-delay="400">
+          <div className="mt-8" data-aos="fade-up" data-aos-delay="1100">
             <AuthShowcase />
           </div>
         </section>
@@ -61,7 +83,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Leaderboard Section (always visible) */}
+        {/* Leaderboard Section */}
         <section className="bg-F5FAFA snap-center py-16 px-4 md:px-8">
           <h1
             className="text-1E635F text-3xl md:text-4xl font-bold text-center mb-4"
