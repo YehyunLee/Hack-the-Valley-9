@@ -83,7 +83,7 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
 
             Your task is to:
             Identify objects that appear in both the main and secondary computer vision.
-            Focus only on objects that are commonly discarded as trash, such as packaging, food-related items, or household waste. Ignore clothes, persons and electronics (like laptops, TVs, phones, keyboards etc.).
+            Focus only on objects that are commonly discarded as trash, such as packaging, food-related items, or household waste. Ignore clothes, tops, persons and electronics (like laptops, TVs, phones, keyboards etc.).
             If there is something in main computer vision result that is missing in secondary computer vision and the object
             is commonly discarded as trash, include it. Make sure to do this.
 
