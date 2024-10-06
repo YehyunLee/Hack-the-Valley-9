@@ -82,10 +82,10 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
             Secondary computer vision: ${req.body.detectedObjects.join(' ')}
 
             Your task is to:
-            Identify objects that appear in both the main and secondary computer vision.
+            Identify only the objects that appear in both the main and secondary computer vision.
             Focus only on objects that are commonly discarded as trash, such as packaging, food-related items, or household waste. Ignore clothes, tops, persons and electronics (like laptops, TVs, phones, keyboards etc.).
-            If there is something in main computer vision result that is missing in secondary computer vision and the object
-            is commonly discarded as trash, include it. Make sure to do this.
+            If there is something in main computer vision result that is missing in secondary computer vision or secondary computer vision output is empty
+            and the object is commonly discarded as trash, include it. Make sure to do this.
 
 
             Assumptions:
@@ -101,7 +101,7 @@ export default async function classifyObjects(req: NextApiRequest, res: NextApiR
 
             REMINDER: Don't do a full breakdown in the answer!!
 
-            If both computer visions are empty, just say "keep scanning!"
+            If both computer visions are empty or both dont have anything commonly discarded as trash, just say "keep scanning!"
         `;
         console.log(prompt);
         // Create an instance of the GoogleGenerativeAI client
